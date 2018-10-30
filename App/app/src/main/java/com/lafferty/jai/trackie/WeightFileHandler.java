@@ -17,32 +17,26 @@ import java.util.TreeMap;
 
 public class WeightFileHandler {
 
-    private Context _context;
-    private ArrayList<Weight> _weights;
-    private FileInputStream _fis;
-    private FileOutputStream _fos;
-    private String _filename;
+    private static Context _context;
+    private static ArrayList<Weight> _weights;
+    private static FileInputStream _fis;
+    private static FileOutputStream _fos;
+    private static String _filename;
 
-    public WeightFileHandler(String filename, Context context){
+    public static void Initialise(String filename, Context context){
         _context = context;
         _filename = filename;
-        _weights = ReadWeights(_filename);
+        _weights = new ArrayList<>(ReadWeights());
     }
 
-    public WeightFileHandler(String filename, Context context, ArrayList<Weight> weights){
-        _context = context;
-        _filename = filename;
-        _weights = weights;
-    }
-
-    public ArrayList<Weight> ReadWeights (String filename) {
+    public static ArrayList<Weight> ReadWeights () {
         ArrayList<Weight> result = new ArrayList<>();
 
         try {
 
-            CheckFileStatus(filename);
+            CheckFileStatus();
 
-            _fis = _context.openFileInput(filename);
+            _fis = _context.openFileInput(_filename);
 
             if (_fis != null){
                 InputStreamReader inputStreamReader = new InputStreamReader(_fis);
@@ -77,18 +71,19 @@ public class WeightFileHandler {
         return result;
     }
 
-    public Weight WriteWeight(long date, float weightVal){
+    public static Weight WriteWeight(long date, float weightVal, Boolean append){
 
         Weight weight = new Weight(date, weightVal);
         _weights.add(weight);
         String result = String.format(Locale.ENGLISH, "%d,%f",date, weightVal);
 
         try{
-            _fos = _context.openFileOutput(_filename,Context.MODE_APPEND);
+            if (append){_fos = _context.openFileOutput(_filename,Context.MODE_APPEND);}
+            else {_fos = _context.openFileOutput(_filename, Context.MODE_PRIVATE);}
             if (_fos != null) {
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(_fos);
                 BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-                bufferedWriter.newLine();
+                if(ReadWeights().size() != 0){ bufferedWriter.newLine();}
                 bufferedWriter.write(result);
                 bufferedWriter.close();
                 outputStreamWriter.close();
@@ -100,14 +95,33 @@ public class WeightFileHandler {
         return weight;
     }
 
-    public void CheckFileStatus(String filename){
+    public static Weight WriteWeight(long date, float weightVal){
+        return WriteWeight(date,weightVal,true);
+    }
+
+    public static void DeleteLastEntry(){
+        ArrayList<Weight> newWeights = ReadWeights();
+        newWeights.remove(newWeights.size()-1);
+        if(!newWeights.isEmpty()) {
+            WriteWeight(newWeights.get(0).get_date(), newWeights.get(0).get_weight(), false);
+            for (Weight w : newWeights.subList(1, newWeights.size())) {
+                WriteWeight(w.get_date(), w.get_weight());
+            }
+        }
+    }
+
+    public static void OverrideWeight(long date, float weightVal){
+        DeleteLastEntry();
+        WriteWeight(date, weightVal);
+    }
+
+    public static void CheckFileStatus(){
         try {
 
-            File myFile = new File(_context.getFilesDir(),filename);
+            File myFile = new File(_context.getFilesDir(),_filename);
 
             if (myFile.createNewFile()) {
                 //CRASHES APP
-                WriteWeight(Stats.getLongDateWithoutTime(),0);
             }
 
         } catch (IOException e) {
@@ -115,7 +129,23 @@ public class WeightFileHandler {
         }
     }
 
-    public ArrayList<Weight> get_weights(){
+    public static void Wipe(){
+        try{
+            _fos = _context.openFileOutput(_filename, Context.MODE_PRIVATE);
+            if (_fos != null) {
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(_fos);
+                BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+                bufferedWriter.write("");
+                bufferedWriter.close();
+                outputStreamWriter.close();
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public static ArrayList<Weight> get_weights(){
         return _weights;
     }
 }

@@ -26,6 +26,8 @@
             android:id="@+id/btSetUserPrefs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
             android:text="@string/user_details" />
 
         <LinearLayout
@@ -44,7 +46,7 @@
             <Spinner
                 android:id="@+id/UnitSpinner"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
             </Spinner>
         </LinearLayout>
@@ -53,12 +55,16 @@
             android:id="@+id/btSaveSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
             android:text="@string/save" />
 
         <Button
             android:id="@+id/btWipeData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:onClick="wipeAllData"
             android:text="@string/wipe" />
 
 

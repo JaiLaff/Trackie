@@ -41,9 +41,14 @@ public class StandardHomeFragment extends Fragment {
 
     public void SetStats(){
         ArrayList<Weight> weights = ((HomeActivity)getActivity()).get_weights();
-        String[] weekly = Stats.WeekAverageChange(weights);
-        tvStats1.setText(Stats.CurrentStreak(weights));
-        tvStats2.setText(weekly[0]);
-        tvMotivate.setText(weekly[1]);
+        if (weights.size() > 5) {
+            String[] weekly = Stats.WeekAverageChange(weights);
+            tvStats1.setText(Stats.CurrentStreak(weights));
+            tvStats2.setText(weekly[0]);
+            tvMotivate.setText(weekly[1]);
+        } else {
+            tvStats1.setText(getText(R.string.stats_error));
+
+        }
     }
 }

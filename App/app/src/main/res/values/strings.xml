@@ -18,5 +18,11 @@
     <string name="user_details">Set User Details</string>
     <string name="save">Save</string>
     <string name="wipe">Wipe All Data</string>
+    <string name="confirm_title">Wipe All Data</string>
+    <string name="confirm_desc">Are you sure you want to wipe all data? This includes weights and preferences!\n\nTrackie will restart</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="stats_error">Statistics will be available to you after 5 entries</string>
+    <string name="nav_header_error">Have you entered all your personal details?\nYou can change this in the settings menu</string>
 
 </resources>

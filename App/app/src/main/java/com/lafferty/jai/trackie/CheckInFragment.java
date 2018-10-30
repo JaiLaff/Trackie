@@ -39,14 +39,11 @@ public class CheckInFragment extends Fragment {
     }
 
     public void AddWeight(String text){
-        float weight;
+        float weightVal;
         long date = Stats.getLongDateWithoutTime();
         try{
-            weight = Float.parseFloat(text);
-            String filename = ((HomeActivity)getActivity()).get_filename();
-            ArrayList<Weight> weights = ((HomeActivity)getActivity()).get_weights();
-            WeightFileHandler fh = new WeightFileHandler(filename,getContext(),weights);
-            ((HomeActivity)getActivity()).add_weight(fh.WriteWeight(date,weight));
+            weightVal = Float.parseFloat(text);
+            ((HomeActivity)getActivity()).add_weight(new Weight(date,weightVal));
         }catch (Exception e){
             e.printStackTrace();
         }

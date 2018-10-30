@@ -13,15 +13,25 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-
+import java.util.Locale;
+//TODO General: Make sure all buttons on all activities/fragments are hooked up
+//TODO General: Make sure metric to lbs conversion and textviews are updated everywhere
+//TODO 1: Complete User details fragment
+//TODO 2: Set user details around the app in the textviews that require it
+//TODO 3: Create a calculator class that is able to convert lbs to kgs
+//TODO 4: set the lbs/kgs units on all views that need the unit clarification
+//TODO 5: Create BMI calc activity
 public class HomeActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
     private static ArrayList<Weight> _weights;
     private final String WEIGHT_DATA_FILENAME = "WeightData.txt";
+    private final String PREFERENCES_FILENAME = "UserPrefs";
     private FragmentManager fm = getSupportFragmentManager();
 
     @Override
@@ -34,6 +44,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void InitUI(){
+        PreferenceManager.Initialise(this, PREFERENCES_FILENAME);
+        WeightFileHandler.Initialise(WEIGHT_DATA_FILENAME, this);
         NavigationSetUp();
         CreateToolbar();
         CreateGraphFragment();
@@ -45,7 +57,12 @@ public class HomeActivity extends AppCompatActivity {
         final NavigationView navigationView = findViewById(R.id.nav_view);
 
         //Access the header layout
-        navigationView.getHeaderView(0);
+        View headerView = navigationView.getHeaderView(0);
+        TextView headerName = headerView.findViewById(R.id.tvHeaderName);
+        if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
+        else {
+            headerName.setText(String.format(Locale.ENGLISH, "%s(%d)", PreferenceManager.get_name(),PreferenceManager.get_age()));
+        }
         //TODO: Set some cool text here, stats etc
 
         navigationView.setNavigationItemSelectedListener(
@@ -112,8 +129,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void LoadWeightData(){
-        WeightFileHandler fh = new WeightFileHandler(WEIGHT_DATA_FILENAME, this);
-        _weights = fh.get_weights();
+        _weights = new ArrayList<Weight>(WeightFileHandler.get_weights());
     }
 
     public void AddValueToGraph(Weight weight){
@@ -124,6 +140,20 @@ public class HomeActivity extends AppCompatActivity {
     public void OverrideValueOnGraph(Weight weight){
         GraphFragment graphFrag = (GraphFragment)fm.findFragmentByTag("GraphFragment");
         graphFrag.OverrideValue(weight);
+    }
+
+    public void add_weight(Weight weight){
+        //only if same date
+        if (_weights.size() >0 && weight.get_date() == _weights.get(_weights.size()-1).get_date()){
+            _weights.remove(_weights.size()-1);
+            _weights.add(weight);
+            WeightFileHandler.OverrideWeight(weight.get_date(),weight.get_weight());
+            OverrideValueOnGraph(weight);
+        } else {
+            _weights.add(weight);
+            WeightFileHandler.WriteWeight(weight.get_date(),weight.get_weight());
+            AddValueToGraph(weight);
+        }
     }
 
 
@@ -166,17 +196,5 @@ public class HomeActivity extends AppCompatActivity {
         return _weights;
     }
 
-    public String get_filename(){
-        return WEIGHT_DATA_FILENAME;
-    }
 
-    public void add_weight(Weight weight){
-        if (weight.get_date() <= _weights.get(_weights.size()-1).get_date()){
-            _weights.remove(_weights.size()-1);
-            OverrideValueOnGraph(weight);
-        } else {
-            _weights.add(weight);
-            AddValueToGraph(weight);
-        }
-    }
 }

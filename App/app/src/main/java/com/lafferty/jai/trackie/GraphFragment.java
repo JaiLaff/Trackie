@@ -1,5 +1,6 @@
 package com.lafferty.jai.trackie;
 
+import android.content.Context;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,14 +38,18 @@ public class GraphFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-       _weights = ((HomeActivity)getActivity()).get_weights();
+       _weights = new ArrayList<>(((HomeActivity)getActivity()).get_weights());
        graph = view.findViewById(R.id.graph);
        CreateGraph();
     }
 
     public void CreateGraph(){
         LineData lineData = new LineData(CreateDataSet());
-        graph.setData(lineData);
+        if (_weights.isEmpty()){
+            graph.clear();
+        } else {
+            graph.setData(lineData);
+        }
         StyleGraph();
         graph.invalidate();
     }
@@ -70,6 +75,7 @@ public class GraphFragment extends Fragment {
     public void StyleGraph(){
         // Visual
         graph.setNoDataText("Start by entering your current weight!");
+        graph.setNoDataTextColor(ContextCompat.getColor(getActivity(),R.color.colorPrimaryDark));
         graph.setDrawGridBackground(false);
         graph.setDrawBorders(false);
         Description desc = new Description();
@@ -114,8 +120,13 @@ public class GraphFragment extends Fragment {
 
     public void AddValue(Weight weight){
         LineData lineData = graph.getLineData();
-        lineData.addEntry(new Entry(weight.get_date(), weight.get_weight()),0);
-        RefreshGraph();
+        if(lineData == null){
+            _weights.add(weight);
+            CreateGraph();
+        } else {
+            lineData.addEntry(new Entry(weight.get_date(), weight.get_weight()), 0);
+            RefreshGraph();
+        }
     }
 
     public void OverrideValue(Weight weight){

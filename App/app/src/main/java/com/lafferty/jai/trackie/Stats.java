@@ -45,8 +45,6 @@ public class Stats {
         float change = 0;
         Collections.reverse(weights);
 
-
-
         try{
             long testDate = weights.get(0).get_date() - (7 * 86400000);
             for (int i=1; i<weights.size(); i++){
@@ -84,7 +82,7 @@ public class Stats {
 
     public static String[] WeekAverageChange(ArrayList<Weight> weights){
         float fResult = WeightChangeOverLastWeek(weights);
-        String sResult="";
+        String sResult;
         String[] result = new String[2];
         if(fResult > 0){
             sResult = String.format(Locale.ENGLISH, "+%.1f", fResult);
