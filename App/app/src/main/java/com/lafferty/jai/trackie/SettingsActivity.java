@@ -1,43 +1,37 @@
 package com.lafferty.jai.trackie;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
-public class HomeActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    private static ArrayList<Weight> _weights;
-    private final String WEIGHT_DATA_FILENAME = "WeightData.txt";
-    private FragmentManager fm = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_settings);
         InitUI();
-        LoadWeightData();
-        //TODO Async Task here for loading of weights and points
     }
 
     public void InitUI(){
         NavigationSetUp();
         CreateToolbar();
-        CreateGraphFragment();
-        CreateStandardHomeFragment();
+        InitSpinner();
     }
 
     public void NavigationSetUp(){
@@ -85,67 +79,50 @@ public class HomeActivity extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        actionbar.setTitle("Settings");
     }
 
-    public void CreateGraphFragment(){
-        GraphFragment graphFrag = new GraphFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.GraphPlaceholder, graphFrag, "GraphFragment");
-        ft.commit();
-        fm.executePendingTransactions();
+    public void InitSpinner(){
+        Spinner spinner = findViewById(R.id.UnitSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.preferred_units,R.layout.support_simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        switch (position){
+                            //kgs
+                            case 0:
+                                break;
+                                //lbs
+                            case 1:
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                }
+        );
     }
-
-    public void CreateStandardHomeFragment(){
-        StandardHomeFragment homeFrag = new StandardHomeFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.BottomFragmentPlaceholder, homeFrag, "HomeFragment");
-        ft.commit();
-        fm.executePendingTransactions();
-    }
-
-    public void CreateCheckInFragment(){
-        CheckInFragment checkInFrag = new CheckInFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.BottomFragmentPlaceholder, checkInFrag, "CheckInFragment");
-        ft.commit();
-        fm.executePendingTransactions();
-    }
-
-    public void LoadWeightData(){
-        WeightFileHandler fh = new WeightFileHandler(WEIGHT_DATA_FILENAME, this);
-        _weights = fh.get_weights();
-    }
-
-    public void AddValueToGraph(Weight weight){
-        GraphFragment graphFrag = (GraphFragment)fm.findFragmentByTag("GraphFragment");
-        graphFrag.AddValue(weight);
-    }
-
-    public void OverrideValueOnGraph(Weight weight){
-        GraphFragment graphFrag = (GraphFragment)fm.findFragmentByTag("GraphFragment");
-        graphFrag.OverrideValue(weight);
-    }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_bar, menu);
+        inflater.inflate(R.menu.action_bar_home, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent i = new Intent(this, SettingsActivity.class);
+            case R.id.action_home:
+                Intent i = new Intent(this, HomeActivity.class);
                 startActivity(i);
-                return true;
-
-            case R.id.action_share:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
                 return true;
 
             case android.R.id.home:
@@ -162,21 +139,4 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    public static ArrayList<Weight> get_weights(){
-        return _weights;
-    }
-
-    public String get_filename(){
-        return WEIGHT_DATA_FILENAME;
-    }
-
-    public void add_weight(Weight weight){
-        if (weight.get_date() <= _weights.get(_weights.size()-1).get_date()){
-            _weights.remove(_weights.size()-1);
-            OverrideValueOnGraph(weight);
-        } else {
-            _weights.add(weight);
-            AddValueToGraph(weight);
-        }
-    }
 }

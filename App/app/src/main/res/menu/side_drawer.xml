@@ -2,20 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_settings_white"
-            android:title="camera" />
+            android:id="@+id/nav_converter"
+            android:icon="@drawable/ico_convert_black"
+            android:title="@string/converter" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_settings_white"
-            android:title="gallery"/>
+            android:id="@+id/nav_bmi_calc"
+            android:icon="@drawable/ico_bmi_black"
+            android:title="@string/bmi_calc"/>
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_settings_white"
-            android:title="slideshow" />
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ico_history_black"
+            android:title="@string/history" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_settings_white"
-            android:title="manage" />
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ico_info_black"
+            android:title="@string/about" />
+        <item
+            android:id="@+id/nav_none"
+            android:title=""
+            android:visible="false"
+            android:checkable="true"/>
     </group>
 </menu>
