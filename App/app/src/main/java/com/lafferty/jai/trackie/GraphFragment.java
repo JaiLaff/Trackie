@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -22,6 +23,8 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
@@ -30,6 +33,7 @@ public class GraphFragment extends Fragment {
 
     private ArrayList<Weight> _weights;
     private LineChart graph;
+    private TextView title;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,6 +44,13 @@ public class GraphFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
        _weights = new ArrayList<>(((HomeActivity)getActivity()).get_weights());
        graph = view.findViewById(R.id.graph);
+       title = view.findViewById(R.id.graphTitle);
+       if (PreferenceManager.get_name() == "") {
+           title.setText(view.getContext().getText(R.string.default_graph_title));
+       }else {
+           String text = String.format(view.getContext().getText(R.string.graph_title).toString(),PreferenceManager.get_name());
+           title.setText(text);
+       }
        CreateGraph();
     }
 

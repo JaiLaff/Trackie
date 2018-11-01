@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 //TODO General: Make sure all buttons on all activities/fragments are hooked up
 //TODO General: Make sure metric to lbs conversion and textviews are updated everywhere
-//TODO 2: Set user details around the app in the textviews that require it
 //TODO 3: Create a calculator class that is able to convert lbs to kgs
 //TODO 4: set the lbs/kgs units on all views that need the unit clarification
 //TODO 5: Create BMI calc activity
@@ -66,7 +65,8 @@ public class HomeActivity extends AppCompatActivity {
         TextView headerName = headerView.findViewById(R.id.tvHeaderName);
         if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
         else {
-            headerName.setText(String.format(Locale.ENGLISH, "%s (Age: %d)", PreferenceManager.get_name(),PreferenceManager.get_age()));
+            String text = this.getText(R.string.nav_welcome).toString();
+            headerName.setText(String.format(Locale.ENGLISH, text, PreferenceManager.get_name()));
         }
         //TODO: Set some cool text here, stats etc
 

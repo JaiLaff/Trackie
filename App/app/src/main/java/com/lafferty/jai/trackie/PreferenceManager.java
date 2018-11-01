@@ -16,12 +16,8 @@ public class PreferenceManager {
     }
 
     public static void Wipe(){
-        set_name("");
-        set_age(0);
-        set_gender("");
-        set_height(0);
-        set_metric(true);
-        commitChanges();
+        _editor.clear();
+        _editor.commit();
     }
 
     public static void commitChanges(){
@@ -38,7 +34,7 @@ public class PreferenceManager {
     }
 
     public static String get_name() {
-        return _prefs.getString("name", "{name}");
+        return _prefs.getString("name", "");
     }
 
     public static void set_name(String name) {
@@ -62,7 +58,7 @@ public class PreferenceManager {
     }
 
     public static String get_gender() {
-       return _prefs.getString("gender", "{gender}");
+       return _prefs.getString("gender", "");
     }
 
     public static void set_gender(String gender) {

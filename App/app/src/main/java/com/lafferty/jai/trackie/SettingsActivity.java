@@ -13,7 +13,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -44,7 +48,13 @@ public class SettingsActivity extends AppCompatActivity {
         final NavigationView navigationView = findViewById(R.id.nav_view);
 
         //Access the header layout
-        navigationView.getHeaderView(0);
+        View headerView = navigationView.getHeaderView(0);
+        TextView headerName = headerView.findViewById(R.id.tvHeaderName);
+        if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
+        else {
+            String text = this.getText(R.string.nav_welcome).toString();
+            headerName.setText(String.format(Locale.ENGLISH, text, PreferenceManager.get_name()));
+        }
         //TODO: Set some cool text here, stats etc
 
         navigationView.setNavigationItemSelectedListener(

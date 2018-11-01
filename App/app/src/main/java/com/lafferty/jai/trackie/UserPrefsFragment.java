@@ -42,8 +42,9 @@ public class UserPrefsFragment extends Fragment {
                 startActivity(i);
             }
         });
-        LoadData();
         InitSpinner();
+        LoadData();
+
     }
 
     public void InitSpinner(){
