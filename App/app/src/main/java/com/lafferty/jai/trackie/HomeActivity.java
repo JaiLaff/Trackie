@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.Locale;
 //TODO General: Make sure all buttons on all activities/fragments are hooked up
 //TODO General: Make sure metric to lbs conversion and textviews are updated everywhere
-//TODO 3: Create a calculator class that is able to convert lbs to kgs
-//TODO 4: set the lbs/kgs units on all views that need the unit clarification
 //TODO 5: Create BMI calc activity
 public class HomeActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
     private static ArrayList<Weight> _weights;
+    private static boolean _weightsInMetric;
     private final String WEIGHT_DATA_FILENAME = "WeightData.txt";
     private final String PREFERENCES_FILENAME = "UserPrefs";
     private FragmentManager fm = getSupportFragmentManager();
@@ -36,8 +35,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        PreferenceManager.Initialise(this, PREFERENCES_FILENAME);
-        WeightFileHandler.Initialise(WEIGHT_DATA_FILENAME, this);
+        InitHelpers();
         InitUI();
         LoadWeightData();
         //TODO Async Task here for loading of weights and points
@@ -49,7 +47,14 @@ public class HomeActivity extends AppCompatActivity {
         InitUI();
     }
 
+    public void InitHelpers(){
+        PreferenceManager.Initialise(this, PREFERENCES_FILENAME);
+        WeightFileHandler.Initialise(WEIGHT_DATA_FILENAME, this);
+        Stats.Initialise(this);
+    }
+
     public void InitUI(){
+        _weightsInMetric = PreferenceManager.is_metric();
         NavigationSetUp();
         CreateToolbar();
         CreateGraphFragment();
@@ -134,7 +139,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void LoadWeightData(){
-        _weights = new ArrayList<Weight>(WeightFileHandler.get_weights());
+        _weights = new ArrayList<>(WeightFileHandler.get_weights());
     }
 
     public void AddValueToGraph(Weight weight){
@@ -159,6 +164,22 @@ public class HomeActivity extends AppCompatActivity {
             WeightFileHandler.WriteWeight(weight.get_date(),weight.get_weight());
             AddValueToGraph(weight);
         }
+    }
+
+    public static void convertWeightsToLbs(){
+        if(!_weightsInMetric){return;}
+        for (Weight w : _weights){
+            w.convertToLbs();
+        }
+        _weightsInMetric = false;
+    }
+
+    public static void convertWeightsToKgs(){
+        if(_weightsInMetric){return;}
+        for (Weight w : _weights){
+            w.convertToKgs();
+        }
+        _weightsInMetric = true;
     }
 
 

@@ -27,8 +27,14 @@
     <string name="nav_header_error">Have you entered all your personal details?\n\nTo help make our calculations more precise, you can set these in the settings menu.</string>
     <string name="name">Name:</string>
     <string name="age">Age:</string>
-    <string name="height">Height:</string>
+    <string name="height">Height (%s):</string>
     <string name="gender">Gender:</string>
     <string name="nav_welcome">Welcome to Trackie %s.\n\nGood to see you back</string>
+    <string name="weight_change_last_week">Over the last week, your average daily weight change is: %s%s</string>
+    <string name="keep_it_up">Keep it up!</string>
+    <string name="keep_pushing">You can do it. Keep pushing!</string>
+    <string name="gain_streak">You are %d days into a weight gain streak!</string>
+    <string name="loss_streak">You are %d days into a weight loss streak!</string>
+    <string name="no_streak">No Current Streak</string>
 
 </resources>

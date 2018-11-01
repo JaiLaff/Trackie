@@ -19,6 +19,7 @@ public class SettingsFragment extends Fragment {
 
     private Button btUserDetails;
     private Button btWipe;
+    private Button btSave;
     private Spinner spinner;
 
 
@@ -32,6 +33,16 @@ public class SettingsFragment extends Fragment {
         spinner = view.findViewById(R.id.UnitSpinner);
         btUserDetails = view.findViewById(R.id.btSetUserPrefs);
         btWipe = view.findViewById(R.id.btWipeData);
+        btSave = view.findViewById(R.id.btSaveSettings);
+
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                SaveSettings();
+                Intent i = new Intent(getActivity(), HomeActivity.class);
+                startActivity(i);
+            }
+        });
 
         btUserDetails.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,18 +72,7 @@ public class SettingsFragment extends Fragment {
                 new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        switch (position){
 
-                            //kgs
-                            case 0:
-                                PreferenceManager.set_metric(true);
-                                break;
-                            //lbs
-                            case 1:
-                                PreferenceManager.set_metric(false);
-                                break;
-                        }
-                        PreferenceManager.commitChanges();
                     }
 
                     @Override
@@ -81,6 +81,25 @@ public class SettingsFragment extends Fragment {
                     }
                 }
         );
+    }
+
+    public void SaveSettings(){
+        int position = spinner.getSelectedItemPosition();
+        switch (position){
+
+            //kgs
+            case 0:
+                PreferenceManager.set_metric(true);
+                HomeActivity.convertWeightsToKgs();
+                break;
+            //lbs
+            case 1:
+                PreferenceManager.set_metric(false);
+                HomeActivity.convertWeightsToLbs();
+                break;
+        }
+        PreferenceManager.commitChanges();
+
     }
 
     public void wipeAllData(){

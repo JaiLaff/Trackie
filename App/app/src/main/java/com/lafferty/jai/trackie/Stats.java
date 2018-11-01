@@ -1,11 +1,19 @@
 package com.lafferty.jai.trackie;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
 
 public class Stats {
+
+    private static Context _context;
+
+    public static void Initialise(Context context) {
+        _context = context;
+    }
 
     public static long getLongDateWithoutTime(){
         Calendar cal = Calendar.getInstance();
@@ -18,44 +26,58 @@ public class Stats {
     }
 
     private static int GainStreak(ArrayList<Weight> weights){
+        ArrayList<Weight> _weights = new ArrayList<>(weights);
+        Collections.reverse(_weights);
         int days= 0;
-        for (int i=0; i < weights.size()-1; i++){
-            if(weights.get(i+1).get_weight() < weights.get(i).get_weight()){
+        for (int i=0; i < _weights.size()-1; i++){
+            if(_weights.get(i+1).get_weight() < _weights.get(i).get_weight()){
                 days ++;
             } else {
-                days = 0;
+                return days;
             }
         }
-        return days;
+        return 0;
     }
 
     private static int LossStreak(ArrayList<Weight> weights){
+        ArrayList<Weight> _weights = new ArrayList<>(weights);
+        Collections.reverse(_weights);
         int days= 0;
-        for (int i=0; i < weights.size()-1; i++){
-            if(weights.get(i+1).get_weight() > weights.get(i).get_weight()){
+        for (int i=0; i < _weights.size()-1; i++){
+            if(_weights.get(i+1).get_weight() > _weights.get(i).get_weight()){
                 days ++;
             } else {
-                days = 0;
+                return days;
             }
         }
-        return days;
+        return 0;
     }
 
-    private static float WeightChangeOverLastWeek( ArrayList<Weight> weights){
-        float change = 0;
+    private static double WeightChangeOverLastWeek( ArrayList<Weight> weights){
+        double change = 0;
+        int i;
+        ArrayList<Weight> _weights = new ArrayList<>(weights);
+        Collections.reverse(_weights);
         Collections.reverse(weights);
 
         try{
-            long testDate = weights.get(0).get_date() - (7 * 86400000);
-            for (int i=1; i<weights.size(); i++){
-                if (weights.get(i).get_date() < testDate){
-                } else if (weights.get(i-1).get_date() > testDate){
-                    change = weights.get(i-1).get_weight()-weights.get(0).get_weight();
+            long testDate = _weights.get(0).get_date() - (7 * 86400000);
+            //If the second to most recent date is out of the range
+            //Then there is no change as only 1 date is within range
+            if(_weights.get(1).get_date() < testDate) {
+                return 0;
+            }
+            for (i = 1; _weights.get(i).get_date() >= testDate;i++){
+                if((i == _weights.size()-1) || (_weights.get(i).get_date() <= testDate)){
+                    change = _weights.get(0).get_weight() - _weights.get(i).get_weight();
+                    return change;
                 }
             }
+
         } catch (Exception e){
             e.printStackTrace();
         }
+
         return change;
     }
 
@@ -66,12 +88,14 @@ public class Stats {
                 return null;
             }
             String result;
-            if (weights.get(0).get_weight() > weights.get(1).get_weight()) {
-                result = String.format(Locale.ENGLISH, "You are %d days into a weight gain streak!", GainStreak(weights));
-            } else if (weights.get(0).get_weight() < weights.get(1).get_weight()) {
-                result = String.format(Locale.ENGLISH, "You are %d days into a weight loss streak!", LossStreak(weights));
+            int gain = GainStreak(weights);
+            int loss = LossStreak(weights);
+            if (gain > 2) {
+                result = String.format(Locale.ENGLISH, _context.getText(R.string.gain_streak).toString(), gain);
+            } else if (loss > 2) {
+                result = String.format(Locale.ENGLISH, _context.getText(R.string.loss_streak).toString(), loss);
             } else {
-                result = "No current streak";
+                result = _context.getText(R.string.no_streak).toString();
             }
             return result;
         } catch(Exception e){
@@ -81,18 +105,18 @@ public class Stats {
     }
 
     public static String[] WeekAverageChange(ArrayList<Weight> weights){
-        float fResult = WeightChangeOverLastWeek(weights);
+        double fResult = WeightChangeOverLastWeek(weights);
         String sResult;
         String[] result = new String[2];
-        if(fResult > 0){
-            sResult = String.format(Locale.ENGLISH, "+%.1f", fResult);
-            result[1] = "Keep it up!";
+        if(fResult < 0){
+            sResult = String.format(Locale.ENGLISH, "%.1f", fResult);
+            result[1] = _context.getText(R.string.keep_it_up).toString();
         } else {
-            sResult = String.valueOf(fResult);
-            result[1] = "You can do it keep pushing!";
+            sResult = String.format(Locale.ENGLISH, "+%.1f", fResult);
+            result[1] = _context.getText(R.string.keep_pushing).toString();
         }
 
-        result[0] = String.format(Locale.ENGLISH, "Over the last week, your average daily weight change is: %s", sResult);
+        result[0] = String.format(Locale.ENGLISH, _context.getText(R.string.weight_change_last_week).toString(), sResult,PreferenceManager.get_weightUnit());
 
         return result;
     }

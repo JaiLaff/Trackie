@@ -26,6 +26,7 @@ public class CheckInFragment extends Fragment {
     @Override
     public void onViewCreated( View view,  Bundle savedInstanceState) {
         tvCheckInUnit = view.findViewById(R.id.tvCheckInUnit);
+        tvCheckInUnit.setText(PreferenceManager.get_weightUnit());
         etCheckInWeight = view.findViewById(R.id.etCheckInWeight);
         btAdd = view.findViewById(R.id.btAdd);
 
@@ -39,10 +40,11 @@ public class CheckInFragment extends Fragment {
     }
 
     public void AddWeight(String text){
-        float weightVal;
+        double weightVal;
         long date = Stats.getLongDateWithoutTime();
         try{
-            weightVal = Float.parseFloat(text);
+            weightVal = Double.parseDouble(text);
+            if(!PreferenceManager.is_metric()){weightVal = Calc.PoundToKg(weightVal);}
             ((HomeActivity)getActivity()).add_weight(new Weight(date,weightVal));
         }catch (Exception e){
             e.printStackTrace();

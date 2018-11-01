@@ -48,11 +48,11 @@ public class WeightFileHandler {
                     if(s == ""){continue;}
                     else {
                         long date = 0;
-                        float weightVal = 0;
+                        double weightVal = 0;
 
                         String[] splitResult = s.split(",");
                         date = Long.parseLong(splitResult[0]);
-                        weightVal = Float.parseFloat(splitResult[1]);
+                        weightVal = Double.parseDouble(splitResult[1]);
 
                         Weight weight = new Weight(date,weightVal);
 
@@ -71,7 +71,7 @@ public class WeightFileHandler {
         return result;
     }
 
-    public static Weight WriteWeight(long date, float weightVal, Boolean append){
+    public static Weight WriteWeight(long date, double weightVal, Boolean append){
 
         Weight weight = new Weight(date, weightVal);
         _weights.add(weight);
@@ -95,7 +95,7 @@ public class WeightFileHandler {
         return weight;
     }
 
-    public static Weight WriteWeight(long date, float weightVal){
+    public static Weight WriteWeight(long date, double weightVal){
         return WriteWeight(date,weightVal,true);
     }
 
@@ -110,7 +110,7 @@ public class WeightFileHandler {
         }
     }
 
-    public static void OverrideWeight(long date, float weightVal){
+    public static void OverrideWeight(long date, double weightVal){
         DeleteLastEntry();
         WriteWeight(date, weightVal);
     }

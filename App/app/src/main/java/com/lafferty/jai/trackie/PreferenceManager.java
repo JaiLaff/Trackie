@@ -64,4 +64,16 @@ public class PreferenceManager {
     public static void set_gender(String gender) {
         _editor.putString("gender", gender);
     }
+
+    public static String get_weightUnit(){
+        String result;
+        result = is_metric() ? "kgs" : "lbs";
+        return result;
+    }
+
+    public static String get_heightUnit(){
+        String result;
+        result = is_metric() ? "cm" : "inch";
+        return result;
+    }
 }

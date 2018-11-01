@@ -11,9 +11,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+
+import java.util.Locale;
 
 public class UserPrefsFragment extends Fragment {
 
+    private TextView tvUPHeight;
     private EditText etUPName;
     private EditText etUPAge;
     private EditText etUPHeight;
@@ -28,6 +32,8 @@ public class UserPrefsFragment extends Fragment {
 
     @Override
     public void onViewCreated( View view,  Bundle savedInstanceState) {
+        tvUPHeight = view.findViewById(R.id.tvUPHeight);
+        tvUPHeight.setText(String.format(Locale.ENGLISH,getActivity().getText(R.string.height).toString(), PreferenceManager.get_heightUnit()));
         genderSpinner = view.findViewById(R.id.GenderSpinner);
         etUPName = view.findViewById(R.id.etUPName);
         etUPAge = view.findViewById(R.id.etUPAge);
@@ -92,7 +98,11 @@ public class UserPrefsFragment extends Fragment {
     public void LoadData(){
         etUPName.setText(PreferenceManager.get_name());
         etUPAge.setText(String.valueOf(PreferenceManager.get_age()));
-        etUPHeight.setText(String.valueOf(PreferenceManager.get_height()));
+
+        int height = PreferenceManager.get_height();
+        if(!PreferenceManager.is_metric()){height = (int)Math.floor(Calc.CMToInch(height));}
+        etUPHeight.setText(String.valueOf(height));
+
         switch(PreferenceManager.get_gender()){
             case "Male":
                 genderSpinner.setSelection(1);
@@ -118,10 +128,13 @@ public class UserPrefsFragment extends Fragment {
         strAge = etUPAge.getText().toString();
         strHeight = etUPHeight.getText().toString();
 
+        int height = Integer.parseInt(strHeight);
+        if(!PreferenceManager.is_metric()){height = (int)Math.floor(Calc.InchToCM(height));}
+
         PreferenceManager.set_name(strName);
         PreferenceManager.set_age(Integer.parseInt(strAge));
         //TODO: Height Conversion
-        PreferenceManager.set_height(Integer.parseInt(strHeight));
+        PreferenceManager.set_height(height);
         PreferenceManager.set_gender(selectedGender);
         PreferenceManager.commitChanges();
     }

@@ -19,7 +19,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
     private ArrayList<Weight> _weights;
     private ArrayList<String> _dates;
     private ArrayList<String> _weightValues;
-    private ArrayList<Float> _weightChanges;
+    private ArrayList<Double> _weightChanges;
     private Context _context;
 
     public HistoryListAdapter(Context context, ArrayList<Weight> weights) {
@@ -36,21 +36,21 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         for (int i = 0; i < _weights.size(); i++){
             Weight w = _weights.get(i);
             long DateVal = w.get_date();
-            float WeightVal = w.get_weight();
+            double WeightVal = w.get_weight();
             _dates.add(sdf.format(new Date(DateVal)));
             _weightValues.add(String.format(Locale.ENGLISH, "%.1f", WeightVal));
 
             if (i!=0){
-                float change = w.get_weight() - _weights.get(i-1).get_weight();
+                double change = w.get_weight() - _weights.get(i-1).get_weight();
                 _weightChanges.add(change);
             } else {
-                _weightChanges.add(Float.valueOf(0));
+                _weightChanges.add(Double.valueOf(0));
             }
         }
     }
 
     public void formatChange(ViewHolder viewHolder, int i){
-        float val = _weightChanges.get(i);
+        double val = _weightChanges.get(i);
         String result;
         boolean positive;
         if (val >= 0){

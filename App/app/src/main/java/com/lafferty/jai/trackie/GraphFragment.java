@@ -68,7 +68,7 @@ public class GraphFragment extends Fragment {
     public ArrayList<Entry> GenerateEntries(){
         ArrayList<Entry> entries = new ArrayList<>();
         for (Weight w : _weights){
-            entries.add(new Entry(w.get_date(),w.get_weight()));
+            entries.add(new Entry(w.get_date(),(float)w.get_weight()));
         }
         return entries;
     }
@@ -108,6 +108,7 @@ public class GraphFragment extends Fragment {
         graph.getAxisRight().setEnabled(false);
 
         YAxis leftAxis = graph.getAxisLeft();
+        leftAxis.setValueFormatter(new MyYAxisValueFormatter());
         leftAxis.setTextSize(14);
         leftAxis.setGranularity(2f);
         leftAxis.setLabelCount(6);
@@ -135,7 +136,7 @@ public class GraphFragment extends Fragment {
             _weights.add(weight);
             CreateGraph();
         } else {
-            lineData.addEntry(new Entry(weight.get_date(), weight.get_weight()), 0);
+            lineData.addEntry(new Entry(weight.get_date(), (float)weight.get_weight()), 0);
             RefreshGraph();
         }
     }
@@ -144,13 +145,13 @@ public class GraphFragment extends Fragment {
         LineData lineData = graph.getLineData();
         LineDataSet dataSet = (LineDataSet)lineData.getDataSets().get(0);
         dataSet.removeLast();
-        lineData.addEntry(new Entry(weight.get_date(),weight.get_weight()),0);
+        lineData.addEntry(new Entry(weight.get_date(),(float)weight.get_weight()),0);
         dataSet.notifyDataSetChanged();
         RefreshGraph();
     }
 
     //
-    //  Date Value Formatter
+    //  Formatters
     //
 
     public class MyXAxisValueFormatter implements IAxisValueFormatter {
@@ -161,6 +162,13 @@ public class GraphFragment extends Fragment {
             String result = sdf.format(new Date((long)value));
 
             return result;
+        }
+    }
+
+    public class MyYAxisValueFormatter implements IAxisValueFormatter {
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+            return String.format(Locale.ENGLISH, "%.0f%s", value, PreferenceManager.get_weightUnit());
         }
     }
 
