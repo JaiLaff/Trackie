@@ -25,6 +25,7 @@ public class Calc {
     }
 
     public static double MetricBMI(double weight, double height) {
+        height = height/100;
         return weight / (height * height);
     }
 
