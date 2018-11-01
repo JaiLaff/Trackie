@@ -94,7 +94,7 @@ public class SettingsActivity extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-        actionbar.setTitle("Settings");
+        actionbar.setTitle(getText(R.string.settings).toString());
     }
 
     public void createSettings(){

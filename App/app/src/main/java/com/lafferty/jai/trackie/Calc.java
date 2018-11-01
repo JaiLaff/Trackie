@@ -24,11 +24,11 @@ public class Calc {
         return height*CENTIMETER_TO_INCH_MULTIPLIER;
     }
 
-    public static double MetricBMI(double weight, int height) {
+    public static double MetricBMI(double weight, double height) {
         return weight / (height * height);
     }
 
-    public static double ImperialBMI(double weight, int height){
+    public static double ImperialBMI(double weight, double height){
         return IMPERIAL_BMI_MULTIPLIER * (weight / (height*height));
     }
 }

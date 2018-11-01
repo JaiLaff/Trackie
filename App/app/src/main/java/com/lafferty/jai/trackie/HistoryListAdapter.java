@@ -80,7 +80,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        viewHolder.tvWeight.setText(_weightValues.get(i));
+        viewHolder.tvWeight.setText(String.format(Locale.ENGLISH, "%s%s",_weightValues.get(i),PreferenceManager.get_weightUnit()));
         viewHolder.tvDate.setText(_dates.get(i));
         formatChange(viewHolder,i);
     }

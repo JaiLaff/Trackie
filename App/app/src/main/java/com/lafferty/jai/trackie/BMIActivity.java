@@ -2,8 +2,6 @@ package com.lafferty.jai.trackie;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -14,31 +12,27 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
-//TODO General: Make sure all buttons on all activities/fragments are hooked up
-//TODO General: Make sure metric to lbs conversion and textviews are updated everywhere
-//TODO General: Async task to load the app for the first time
-//TODO 5: Create BMI calc activity
-public class HomeActivity extends AppCompatActivity {
+
+public class BMIActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    private static ArrayList<Weight> _weights;
-    private static Boolean _weightsInMetric = null;
-    private final String WEIGHT_DATA_FILENAME = "WeightData.txt";
-    private final String PREFERENCES_FILENAME = "UserPrefs";
-    private FragmentManager fm = getSupportFragmentManager();
+    EditText etBmiWeight;
+    EditText etBmiHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        InitHelpers();
+        setContentView(R.layout.activity_bmi);
         InitUI();
-        LoadWeightData();
     }
 
     @Override
@@ -47,17 +41,10 @@ public class HomeActivity extends AppCompatActivity {
         InitUI();
     }
 
-    public void InitHelpers(){
-        PreferenceManager.Initialise(this, PREFERENCES_FILENAME);
-        WeightFileHandler.Initialise(WEIGHT_DATA_FILENAME, this);
-        Stats.Initialise(this);
-    }
-
     public void InitUI(){
         NavigationSetUp();
         CreateToolbar();
-        CreateGraphFragment();
-        CreateStandardHomeFragment();
+        SetViews();
     }
 
     public void NavigationSetUp(){
@@ -90,12 +77,10 @@ public class HomeActivity extends AppCompatActivity {
                             case R.id.nav_converter:
                                 break;
                             case R.id.nav_bmi_calc:
-                                Intent bmi = new Intent(getBaseContext(),BMIActivity.class);
-                                startActivity(bmi);
                                 break;
                             case R.id.nav_history:
-                                Intent history = new Intent(getBaseContext(),HistoryActivity.class);
-                                startActivity(history);
+                                Intent i = new Intent(getBaseContext(),HistoryActivity.class);
+                                startActivity(i);
                                 break;
                             case R.id.nav_about:
                                 break;
@@ -113,79 +98,69 @@ public class HomeActivity extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        actionbar.setTitle(getText(R.string.bmi_calc));
     }
 
-    public void CreateGraphFragment(){
-        GraphFragment graphFrag = new GraphFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.GraphPlaceholder, graphFrag, "GraphFragment");
-        ft.commit();
-        fm.executePendingTransactions();
+    public void SetViews(){
+        ArrayList<Weight> weights = new ArrayList<>(HomeActivity.get_weights());
+        Collections.reverse(weights);
+        TextView tvBmiWeight = findViewById(R.id.tvBmiWeight);
+        TextView tvBmiHeight = findViewById(R.id.tvBmiHeight);
+        tvBmiHeight.setText(String.format(Locale.ENGLISH,getText(R.string.height_with_unit).toString(),PreferenceManager.get_heightUnit()));
+        tvBmiWeight.setText(String.format(Locale.ENGLISH,getText(R.string.weight_with_unit).toString(),PreferenceManager.get_weightUnit()));
+
+        etBmiWeight = findViewById(R.id.etBmiWeight);
+        etBmiHeight = findViewById(R.id.etBmiHeight);
+        Double weight = weights.get(0).get_weight();
+        double height = PreferenceManager.get_height();
+        if (!PreferenceManager.is_metric()){height = Calc.CMToInch((int)height);}
+        etBmiWeight.setText(String.format(Locale.ENGLISH, "%.2f", weight));
+        etBmiHeight.setText(String.format(Locale.ENGLISH, "%.1f", height));
+
+        TextView tvBmiTitle = findViewById(R.id.tvBmiTitle);
+        TextView tvBmiBody = findViewById(R.id.tvBmiBody);
+        tvBmiTitle.setText("");
+        tvBmiBody.setText("");
     }
 
-    public void CreateStandardHomeFragment(){
-        StandardHomeFragment homeFrag = new StandardHomeFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.BottomFragmentPlaceholder, homeFrag, "HomeFragment");
-        ft.commit();
-        fm.executePendingTransactions();
+    public double CalculateBMI(){
+        String strWeight = etBmiWeight.getText().toString();
+        String strHeight = etBmiHeight.getText().toString();
+        double weight = Double.valueOf(strWeight);
+        double height = Double.valueOf(strHeight);
+
+        double result = 0;
+        if(!PreferenceManager.is_metric()){result = Calc.ImperialBMI(weight,height);}
+        if(PreferenceManager.is_metric()){result = Calc.MetricBMI(weight,height);}
+        return result;
     }
 
-    public void CreateCheckInFragment(){
-        CheckInFragment checkInFrag = new CheckInFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.BottomFragmentPlaceholder, checkInFrag, "CheckInFragment");
-        ft.commit();
-        fm.executePendingTransactions();
+    public void DisplayBmi(double bmi){
+        TextView tvBmiTitle = findViewById(R.id.tvBmiTitle);
+        TextView tvBmiBody = findViewById(R.id.tvBmiBody);
+        String name = PreferenceManager.get_name();
+        String titleText = String.format(Locale.ENGLISH, getText(R.string.bmi_main).toString(),bmi);
+        tvBmiTitle.setText(titleText);
+
+        String range = GenerateBmiRangeText(bmi);
+        String bodyText = String.format(Locale.ENGLISH, getText(R.string.bmi_body).toString(),name,range);
+        tvBmiBody.setText(bodyText);
     }
 
-    public void LoadWeightData(){
-        _weights = new ArrayList<>(WeightFileHandler.get_weights());
-        if(!PreferenceManager.is_metric()){convertWeightsToLbs();}
+    public String GenerateBmiRangeText(double bmi){
+
+        if(bmi < 18.5){return getText(R.string.underweight).toString();}
+        if(bmi < 24.9){return getText(R.string.normal).toString();}
+        if(bmi < 29.9){return getText(R.string.overweight).toString();}
+        if(bmi < 34.9){return getText(R.string.obese).toString();}
+        if(bmi >=34.9){return getText(R.string.extremely_obese).toString();}
+        return "";
     }
 
-    public void AddValueToGraph(Weight weight){
-        GraphFragment graphFrag = (GraphFragment)fm.findFragmentByTag("GraphFragment");
-        graphFrag.AddValue(weight);
+    public void BMI(View v){
+        double bmi = CalculateBMI();
+        DisplayBmi(bmi);
     }
-
-    public void OverrideValueOnGraph(Weight weight){
-        GraphFragment graphFrag = (GraphFragment)fm.findFragmentByTag("GraphFragment");
-        graphFrag.OverrideValue(weight);
-    }
-
-    public void add_weight(Weight weight){
-        //only if same date
-        if (_weights.size() >0 && weight.get_date() == _weights.get(_weights.size()-1).get_date()){
-            _weights.remove(_weights.size()-1);
-            _weights.add(weight);
-            WeightFileHandler.OverrideWeight(weight.get_date(),weight.get_weight());
-            OverrideValueOnGraph(weight);
-        } else {
-            _weights.add(weight);
-            WeightFileHandler.WriteWeight(weight.get_date(),weight.get_weight());
-            AddValueToGraph(weight);
-        }
-    }
-
-    public static void convertWeightsToLbs(){
-        //Weird way of getting around null pointer exceptions for a null Boolean
-        if(Boolean.FALSE.equals(_weightsInMetric)){return;}
-        for (Weight w : _weights){
-            w.convertToLbs();
-        }
-        _weightsInMetric = false;
-    }
-
-    public static void convertWeightsToKgs(){
-        if(Boolean.TRUE.equals(_weightsInMetric)){return;}
-        for (Weight w : _weights){
-            w.convertToKgs();
-        }
-        _weightsInMetric = true;
-    }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -220,10 +195,4 @@ public class HomeActivity extends AppCompatActivity {
 
         }
     }
-
-    public static ArrayList<Weight> get_weights(){
-        return _weights;
-    }
-
-
 }
