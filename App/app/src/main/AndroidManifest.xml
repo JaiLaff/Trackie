@@ -21,17 +21,16 @@
         <activity
             android:name=".HistoryActivity"
             android:launchMode="singleInstance">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:launchMode="singleInstance"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name=".BMIActivity"></activity>
+            android:launchMode="singleInstance" />
+        <activity
+            android:name=".BMIActivity"
+            android:launchMode="singleInstance"/>
+        <activity
+            android:name=".BmiDetailsActivity"
+            android:launchMode="singleInstance"/>
     </application>
 
 </manifest>

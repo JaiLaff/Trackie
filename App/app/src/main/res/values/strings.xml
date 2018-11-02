@@ -43,7 +43,7 @@
     <string name="bmi_main">Your BMI is: %.1f</string>
     <string name="details">What is a BMI?</string>
     <string name="underweight">Underweight</string>
-    <string name="normal">Normal</string>
+    <string name="normal">Healthy</string>
     <string name="overweight">Overweight</string>
     <string name="obese">Obese</string>
     <string name="extremely_obese">Extremely Obese</string>

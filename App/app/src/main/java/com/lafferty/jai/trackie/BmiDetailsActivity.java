@@ -12,26 +12,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Locale;
 
-public class BMIActivity extends AppCompatActivity {
+public class BmiDetailsActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    EditText etBmiWeight;
-    EditText etBmiHeight;
+    private WebView webview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bmi);
+        setContentView(R.layout.activity_bmi_details);
         InitUI();
     }
 
@@ -44,7 +39,7 @@ public class BMIActivity extends AppCompatActivity {
     public void InitUI(){
         NavigationSetUp();
         CreateToolbar();
-        SetViews();
+        SetUpPage();
     }
 
     public void NavigationSetUp(){
@@ -77,10 +72,12 @@ public class BMIActivity extends AppCompatActivity {
                             case R.id.nav_converter:
                                 break;
                             case R.id.nav_bmi_calc:
+                                Intent bmi = new Intent(getBaseContext(),BMIActivity.class);
+                                startActivity(bmi);
                                 break;
                             case R.id.nav_history:
-                                Intent i = new Intent(getBaseContext(),HistoryActivity.class);
-                                startActivity(i);
+                                Intent history = new Intent(getBaseContext(),HistoryActivity.class);
+                                startActivity(history);
                                 break;
                             case R.id.nav_about:
                                 break;
@@ -98,73 +95,12 @@ public class BMIActivity extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-        actionbar.setTitle(getText(R.string.bmi_calc));
+        actionbar.setTitle(getText(R.string.details));
     }
 
-    public void SetViews(){
-        ArrayList<Weight> weights = new ArrayList<>(HomeActivity.get_weights());
-        Collections.reverse(weights);
-        TextView tvBmiWeight = findViewById(R.id.tvBmiWeight);
-        TextView tvBmiHeight = findViewById(R.id.tvBmiHeight);
-        tvBmiHeight.setText(String.format(Locale.ENGLISH,getText(R.string.height_with_unit).toString(),PreferenceManager.get_heightUnit()));
-        tvBmiWeight.setText(String.format(Locale.ENGLISH,getText(R.string.weight_with_unit).toString(),PreferenceManager.get_weightUnit()));
-
-        etBmiWeight = findViewById(R.id.etBmiWeight);
-        etBmiHeight = findViewById(R.id.etBmiHeight);
-        Double weight = weights.get(0).get_weight();
-        double height = PreferenceManager.get_height();
-        if (!PreferenceManager.is_metric()){height = Calc.CMToInch((int)height);}
-        etBmiWeight.setText(String.format(Locale.ENGLISH, "%.2f", weight));
-        etBmiHeight.setText(String.format(Locale.ENGLISH, "%.1f", height));
-
-        TextView tvBmiTitle = findViewById(R.id.tvBmiTitle);
-        TextView tvBmiBody = findViewById(R.id.tvBmiBody);
-        tvBmiTitle.setText("");
-        tvBmiBody.setText("");
-    }
-
-    public double CalculateBMI(){
-        String strWeight = etBmiWeight.getText().toString();
-        String strHeight = etBmiHeight.getText().toString();
-        double weight = Double.valueOf(strWeight);
-        double height = Double.valueOf(strHeight);
-
-        double result = 0;
-        if(!PreferenceManager.is_metric()){result = Calc.ImperialBMI(weight,height);}
-        if(PreferenceManager.is_metric()){result = Calc.MetricBMI(weight,height);}
-        return result;
-    }
-
-    public void DisplayBmi(double bmi){
-        TextView tvBmiTitle = findViewById(R.id.tvBmiTitle);
-        TextView tvBmiBody = findViewById(R.id.tvBmiBody);
-        String name = PreferenceManager.get_name();
-        String titleText = String.format(Locale.ENGLISH, getText(R.string.bmi_main).toString(),bmi);
-        tvBmiTitle.setText(titleText);
-
-        String range = GenerateBmiRangeText(bmi);
-        String bodyText = String.format(Locale.ENGLISH, getText(R.string.bmi_body).toString(),name,range);
-        tvBmiBody.setText(bodyText);
-    }
-
-    public String GenerateBmiRangeText(double bmi){
-
-        if(bmi < 18.5){return getText(R.string.underweight).toString();}
-        if(bmi < 24.9){return getText(R.string.normal).toString();}
-        if(bmi < 29.9){return getText(R.string.overweight).toString();}
-        if(bmi < 34.9){return getText(R.string.obese).toString();}
-        if(bmi >=34.9){return getText(R.string.extremely_obese).toString();}
-        return "";
-    }
-
-    public void BMI(View v){
-        double bmi = CalculateBMI();
-        DisplayBmi(bmi);
-    }
-
-    public void Details(View v){
-        Intent i = new Intent(this, BmiDetailsActivity.class);
-        startActivity(i);
+    public void SetUpPage(){
+        webview = findViewById(R.id.wvBMI);
+        webview.loadUrl("file:///android_asset/bmi_details.html");
     }
 
     @Override

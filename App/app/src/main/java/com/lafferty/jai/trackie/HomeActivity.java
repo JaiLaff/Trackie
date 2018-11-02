@@ -22,7 +22,14 @@ import java.util.Locale;
 //TODO General: Make sure all buttons on all activities/fragments are hooked up
 //TODO General: Make sure metric to lbs conversion and textviews are updated everywhere
 //TODO General: Async task to load the app for the first time
-//TODO 5: Create BMI calc activity
+//TODO 1: Make Bmi details activity
+//TODO 2: Use the bmi activity as a template to make the about avtivity
+//TODO 3: Give the calc object more functionality in terms of converting units
+//TODO 4: Create basic unit converter activity
+//TODO 5: Add HomeActivity to side nav menu on all activities
+//TODO 6: Link all pages in side nav menu on all activities
+//TODO 7: Create some form of sharing mechanism (Interface or different action bar)
+
 public class HomeActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
