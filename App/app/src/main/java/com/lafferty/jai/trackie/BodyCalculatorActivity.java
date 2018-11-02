@@ -2,8 +2,6 @@ package com.lafferty.jai.trackie;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -17,33 +15,16 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Locale;
-//TODO General: Make sure all buttons on all activities/fragments are hooked up
-//TODO General: Make sure metric to lbs conversion and textviews are updated everywhere
-//TODO General: Async task to load the app for the first time
-//TODO 3: Give the calc object more functionality in terms of converting units
-//TODO 4: Create body forecast activity
-//TODO 5: Add HomeActivity to side nav menu on all activities
-//TODO 6: Link all pages in side nav menu on all activities
-//TODO 7: Create some form of sharing mechanism (Interface or different action bar)
 
-public class HomeActivity extends AppCompatActivity {
+public class BodyCalculatorActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    private static ArrayList<Weight> _weights;
-    private static Boolean _weightsInMetric = null;
-    private final String WEIGHT_DATA_FILENAME = "WeightData.txt";
-    private final String PREFERENCES_FILENAME = "UserPrefs";
-    private FragmentManager fm = getSupportFragmentManager();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        InitHelpers();
+        setContentView(R.layout.activity_about);
         InitUI();
-        LoadWeightData();
     }
 
     @Override
@@ -52,17 +33,10 @@ public class HomeActivity extends AppCompatActivity {
         InitUI();
     }
 
-    public void InitHelpers(){
-        PreferenceManager.Initialise(this, PREFERENCES_FILENAME);
-        WeightFileHandler.Initialise(WEIGHT_DATA_FILENAME, this);
-        Stats.Initialise(this);
-    }
-
     public void InitUI(){
         NavigationSetUp();
         CreateToolbar();
-        CreateGraphFragment();
-        CreateStandardHomeFragment();
+        SetViews();
     }
 
     public void NavigationSetUp(){
@@ -93,8 +67,6 @@ public class HomeActivity extends AppCompatActivity {
 
                         switch (menuItem.getItemId()){
                             case R.id.nav_converter:
-                                Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
-                                startActivity(body);
                                 break;
                             case R.id.nav_bmi_calc:
                                 Intent bmi = new Intent(getBaseContext(),BMIActivity.class);
@@ -105,8 +77,6 @@ public class HomeActivity extends AppCompatActivity {
                                 startActivity(history);
                                 break;
                             case R.id.nav_about:
-                                Intent about = new Intent(getBaseContext(),AboutActivity.class);
-                                startActivity(about);
                                 break;
                         }
 
@@ -116,85 +86,18 @@ public class HomeActivity extends AppCompatActivity {
                 });
     }
 
-    public void CreateToolbar(){
+    public void CreateToolbar() {
         Toolbar toolbar = findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        actionbar.setTitle(getText(R.string.calculator));
     }
 
-    public void CreateGraphFragment(){
-        GraphFragment graphFrag = new GraphFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.GraphPlaceholder, graphFrag, "GraphFragment");
-        ft.commit();
-        fm.executePendingTransactions();
+    public void SetViews(){
+        //Set the views here
     }
-
-    public void CreateStandardHomeFragment(){
-        StandardHomeFragment homeFrag = new StandardHomeFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.BottomFragmentPlaceholder, homeFrag, "HomeFragment");
-        ft.commit();
-        fm.executePendingTransactions();
-    }
-
-    public void CreateCheckInFragment(){
-        CheckInFragment checkInFrag = new CheckInFragment();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.BottomFragmentPlaceholder, checkInFrag, "CheckInFragment");
-        ft.commit();
-        fm.executePendingTransactions();
-    }
-
-    public void LoadWeightData(){
-        _weights = new ArrayList<>(WeightFileHandler.get_weights());
-        if(!PreferenceManager.is_metric()){convertWeightsToLbs();}
-    }
-
-    public void AddValueToGraph(Weight weight){
-        GraphFragment graphFrag = (GraphFragment)fm.findFragmentByTag("GraphFragment");
-        graphFrag.AddValue(weight);
-    }
-
-    public void OverrideValueOnGraph(Weight weight){
-        GraphFragment graphFrag = (GraphFragment)fm.findFragmentByTag("GraphFragment");
-        graphFrag.OverrideValue(weight);
-    }
-
-    public void add_weight(Weight weight){
-        //only if same date
-        if (_weights.size() >0 && weight.get_date() == _weights.get(_weights.size()-1).get_date()){
-            _weights.remove(_weights.size()-1);
-            _weights.add(weight);
-            WeightFileHandler.OverrideWeight(weight.get_date(),weight.get_weight());
-            OverrideValueOnGraph(weight);
-        } else {
-            _weights.add(weight);
-            WeightFileHandler.WriteWeight(weight.get_date(),weight.get_weight());
-            AddValueToGraph(weight);
-        }
-    }
-
-    public static void convertWeightsToLbs(){
-        //Weird way of getting around null pointer exceptions for a null Boolean
-        if(Boolean.FALSE.equals(_weightsInMetric)){return;}
-        for (Weight w : _weights){
-            w.convertToLbs();
-        }
-        _weightsInMetric = false;
-    }
-
-    public static void convertWeightsToKgs(){
-        if(Boolean.TRUE.equals(_weightsInMetric)){return;}
-        for (Weight w : _weights){
-            w.convertToKgs();
-        }
-        _weightsInMetric = true;
-    }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -229,10 +132,4 @@ public class HomeActivity extends AppCompatActivity {
 
         }
     }
-
-    public static ArrayList<Weight> get_weights(){
-        return _weights;
-    }
-
-
 }

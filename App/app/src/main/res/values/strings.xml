@@ -10,7 +10,7 @@
     <string name="check_in">Check In</string>
     <string name="add">Add</string>
     <string name="today_weight">Today\'s Weight:</string>
-    <string name="converter">Unit Converter</string>
+    <string name="calculator">Body Calculator</string>
     <string name="bmi_calc">BMI Calculator</string>
     <string name="history">History</string>
     <string name="about">About</string>

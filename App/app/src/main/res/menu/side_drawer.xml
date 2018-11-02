@@ -4,7 +4,7 @@
         <item
             android:id="@+id/nav_converter"
             android:icon="@drawable/ico_convert_black"
-            android:title="@string/converter" />
+            android:title="@string/calculator" />
         <item
             android:id="@+id/nav_bmi_calc"
             android:icon="@drawable/ico_bmi_black"

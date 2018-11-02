@@ -17,3 +17,4 @@ The objective of this app is to create a non-trivial app for my Software Develop
 - Save and load weight data in both Metric and Imperial
 - Display this weight in a graph (Thanks to [PhilJay's MPAndroidChart Library](https://github.com/PhilJay/MPAndroidChart))
 - Calculate BMI based on users' personal data
+- ~~Unit converter (kg-lbs etc.)~~ Predicting future bodyweight and necessary calories to maintain it
