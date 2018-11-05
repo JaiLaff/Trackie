@@ -22,8 +22,6 @@ import java.util.Locale;
 //TODO General: Make sure all buttons on all activities/fragments are hooked up
 //TODO General: Make sure metric to lbs conversion and textviews are updated everywhere
 //TODO General: Async task to load the app for the first time
-//TODO 3: Give the calc object more functionality in terms of converting units
-//TODO 4: Create body forecast activity
 //TODO 5: Add HomeActivity to side nav menu on all activities
 //TODO 6: Link all pages in side nav menu on all activities
 //TODO 7: Create some form of sharing mechanism (Interface or different action bar)
@@ -92,6 +90,9 @@ public class HomeActivity extends AppCompatActivity {
                         // For example, swap UI fragments here
 
                         switch (menuItem.getItemId()){
+                            case R.id.nav_home:
+                                Intent home = new Intent(getBaseContext(),HomeActivity.class);
+                                startActivity(home);
                             case R.id.nav_converter:
                                 Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
                                 startActivity(body);
@@ -232,6 +233,12 @@ public class HomeActivity extends AppCompatActivity {
 
     public static ArrayList<Weight> get_weights(){
         return _weights;
+    }
+
+    public static Weight get_recent_weight(){
+        if (_weights.size() > 0){
+            return _weights.get(_weights.size()-1);
+        } else {return null;}
     }
 
 

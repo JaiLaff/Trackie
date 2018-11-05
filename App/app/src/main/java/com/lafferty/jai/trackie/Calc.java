@@ -32,9 +32,9 @@ public class Calc {
         return weight / (height * height);
     }
 
-    public static double MaintenanceCalories(double weight, int height, int age, String gender, int activityLevel){
+    public static int MaintenanceCalories(double weight, int height, int age, String gender, int activityLevel){
         //http://www.checkyourhealth.org/eat-healthy/cal_calculator.php
-        double result = 0;
+        int result = 0;
         double activityFactor = ACTIVITY_FACTORS[activityLevel];
         double BMR = 0;
         if(PreferenceManager.is_metric()){
@@ -50,7 +50,21 @@ public class Calc {
             BMR = 66 + (6.3 * weight) + (12.9 * height) - (6.8 * age);
         }
 
-        result = activityFactor * BMR;
+        result = (int)Math.round(activityFactor * BMR);
+        return result;
+    }
+
+    public static int DaysToReachGoalWeight(int deficit, double currentWeight, double goalWeight) {
+        //Takes current average daily calories, a deficit and a goal
+        //Assumes no change in physical activity level
+        //Based on the fact that 3500Cal = ~1lb Fat
+        int result = 0;
+        double daysForEachPound = 3500/deficit;
+        double goalChange = currentWeight - goalWeight;
+        if (PreferenceManager.is_metric()){
+            goalChange = Calc.KgToPound(goalChange);
+        }
+        result = (int)Math.ceil(goalChange * daysForEachPound);
         return result;
     }
 

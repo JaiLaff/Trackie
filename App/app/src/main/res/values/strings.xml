@@ -25,6 +25,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="stats_error">Statistics will be available to you after 5 entries</string>
+    <string name="enter_a_weight">Enter a weight first</string>
     <string name="nav_header_error">Have you entered all your personal details?\n\nTo help make our calculations more precise, you can set these in the settings menu.</string>
     <string name="name">Name:</string>
     <string name="age">Age:</string>
@@ -47,5 +48,11 @@
     <string name="overweight">Overweight</string>
     <string name="obese">Obese</string>
     <string name="extremely_obese">Extremely Obese</string>
+    <string name="maintenence_calories">Daily Calories to maintain weight: %s</string>
     <string name="bmi_body">"%s, Your BMI indicates that you are %s.\nKeep in mind that this is not an exact representation of your health\n\nFor more information see our details page linked below</string>
+    <string name="goal_weight">Goal Weight:</string>
+    <string name="deficit">Calorie Deficit: </string>
+    <string name="days_result">It will take %s days to reach your goal</string>
+    <string name="body_calc_null">Enter user data first!</string>
+    <string name="activity_level">Activity Level: </string>
 </resources>

@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ico_home_black"
+            android:title="@string/action_home"/>
+        <item
             android:id="@+id/nav_converter"
             android:icon="@drawable/ico_convert_black"
             android:title="@string/calculator" />

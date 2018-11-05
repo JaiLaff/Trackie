@@ -70,15 +70,24 @@ public class SettingsActivity extends AppCompatActivity {
                         // For example, swap UI fragments here
 
                         switch (menuItem.getItemId()){
+                            case R.id.nav_home:
+                                Intent home = new Intent(getBaseContext(),HomeActivity.class);
+                                startActivity(home);
                             case R.id.nav_converter:
+                                Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
+                                startActivity(body);
                                 break;
                             case R.id.nav_bmi_calc:
+                                Intent bmi = new Intent(getBaseContext(),BMIActivity.class);
+                                startActivity(bmi);
                                 break;
                             case R.id.nav_history:
-                                Intent i = new Intent(getBaseContext(),HistoryActivity.class);
-                                startActivity(i);
+                                Intent history = new Intent(getBaseContext(),HistoryActivity.class);
+                                startActivity(history);
                                 break;
                             case R.id.nav_about:
+                                Intent about = new Intent(getBaseContext(),AboutActivity.class);
+                                startActivity(about);
                                 break;
                         }
 

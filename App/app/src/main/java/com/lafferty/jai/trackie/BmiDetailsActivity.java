@@ -69,7 +69,12 @@ public class BmiDetailsActivity extends AppCompatActivity {
                         // For example, swap UI fragments here
 
                         switch (menuItem.getItemId()){
+                            case R.id.nav_home:
+                                Intent home = new Intent(getBaseContext(),HomeActivity.class);
+                                startActivity(home);
                             case R.id.nav_converter:
+                                Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
+                                startActivity(body);
                                 break;
                             case R.id.nav_bmi_calc:
                                 Intent bmi = new Intent(getBaseContext(),BMIActivity.class);
@@ -80,6 +85,8 @@ public class BmiDetailsActivity extends AppCompatActivity {
                                 startActivity(history);
                                 break;
                             case R.id.nav_about:
+                                Intent about = new Intent(getBaseContext(),AboutActivity.class);
+                                startActivity(about);
                                 break;
                         }
 

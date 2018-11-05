@@ -12,6 +12,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,10 +24,18 @@ import java.util.Locale;
 public class BodyCalculatorActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
+    private Spinner activityLevelSpinner;
+    private TextView tvDailyIntake;
+    private TextView tvDays;
+    private EditText etDeficit;
+    private EditText etGoal;
+    private double weight;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
+        setContentView(R.layout.activity_body_calculator);
         InitUI();
     }
 
@@ -31,6 +43,7 @@ public class BodyCalculatorActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         InitUI();
+        InitSpinner();
     }
 
     public void InitUI(){
@@ -46,12 +59,11 @@ public class BodyCalculatorActivity extends AppCompatActivity {
         //Access the header layout
         View headerView = navigationView.getHeaderView(0);
         TextView headerName = headerView.findViewById(R.id.tvHeaderName);
-        if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
+        if (PreferenceManager.get_name().equals("")){headerName.setText(R.string.nav_header_error);}
         else {
             String text = this.getText(R.string.nav_welcome).toString();
             headerName.setText(String.format(Locale.ENGLISH, text, PreferenceManager.get_name()));
         }
-        //TODO: Set some cool text here, stats etc
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -66,7 +78,12 @@ public class BodyCalculatorActivity extends AppCompatActivity {
                         // For example, swap UI fragments here
 
                         switch (menuItem.getItemId()){
+                            case R.id.nav_home:
+                                Intent home = new Intent(getBaseContext(),HomeActivity.class);
+                                startActivity(home);
                             case R.id.nav_converter:
+                                Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
+                                startActivity(body);
                                 break;
                             case R.id.nav_bmi_calc:
                                 Intent bmi = new Intent(getBaseContext(),BMIActivity.class);
@@ -77,6 +94,8 @@ public class BodyCalculatorActivity extends AppCompatActivity {
                                 startActivity(history);
                                 break;
                             case R.id.nav_about:
+                                Intent about = new Intent(getBaseContext(),AboutActivity.class);
+                                startActivity(about);
                                 break;
                         }
 
@@ -96,7 +115,61 @@ public class BodyCalculatorActivity extends AppCompatActivity {
     }
 
     public void SetViews(){
-        //Set the views here
+        activityLevelSpinner = findViewById(R.id.activityLevelSpinner);
+        tvDailyIntake = findViewById(R.id.tvMaintenenceCalories);
+        etGoal = findViewById(R.id.etGoalWeight);
+        etDeficit = findViewById(R.id.etDeficit);
+        tvDays = findViewById(R.id.tvDaysToReachGoal);
+    }
+
+    public void InitSpinner(){
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.activity_levels,R.layout.support_simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        activityLevelSpinner.setAdapter(adapter);
+
+        activityLevelSpinner.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        SetDailyIntake(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                }
+        );
+    }
+
+    public void SetDailyIntake(int spinnerPosition){
+        String calories;
+        Weight lastWeight = HomeActivity.get_recent_weight();
+        if (lastWeight == null){
+            tvDailyIntake.setText(getText(R.string.stats_error));
+            return;
+        }
+        weight = lastWeight.get_weight();
+        int height = PreferenceManager.get_height();
+        int age = PreferenceManager.get_age();
+        String gender = PreferenceManager.get_gender();
+
+        calories = String.valueOf(Calc.MaintenanceCalories(weight, height, age, gender, spinnerPosition));
+        String calorieText = getText(R.string.maintenence_calories).toString();
+        tvDailyIntake.setText(String.format(Locale.US, calorieText, calories));
+    }
+
+    public void CalculateDays(View v){
+        String strGoal = etGoal.getText().toString();
+        String strDeficit = etDeficit.getText().toString();
+        if (strGoal.equals("") || strDeficit.equals("")){
+            Toast.makeText(this,R.string.body_calc_null, Toast.LENGTH_LONG).show();
+            return;
+        }
+        double goal = Double.parseDouble(etGoal.getText().toString());
+        int deficit = Integer.parseInt(etDeficit.getText().toString());
+        int result = Calc.DaysToReachGoalWeight(deficit,weight,goal);
+        tvDays.setText(String.format(Locale.US,getText(R.string.days_result).toString(),result));
     }
 
     @Override
