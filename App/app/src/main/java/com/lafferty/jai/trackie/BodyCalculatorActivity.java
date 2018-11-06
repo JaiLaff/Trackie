@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-public class BodyCalculatorActivity extends AppCompatActivity {
+public class BodyCalculatorActivity extends AppCompatActivity implements IShareable{
 
     private DrawerLayout mDrawerLayout;
     private Spinner activityLevelSpinner;
@@ -30,12 +30,19 @@ public class BodyCalculatorActivity extends AppCompatActivity {
     private EditText etDeficit;
     private EditText etGoal;
     private double weight;
+    private double goal;
+    private int deficit;
+    private int result;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_body_calculator);
+        weight = 0;
+        goal = 0;
+        deficit = 0;
+        result = 0;
         InitUI();
     }
 
@@ -81,6 +88,7 @@ public class BodyCalculatorActivity extends AppCompatActivity {
                             case R.id.nav_home:
                                 Intent home = new Intent(getBaseContext(),HomeActivity.class);
                                 startActivity(home);
+                                break;
                             case R.id.nav_converter:
                                 Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
                                 startActivity(body);
@@ -98,8 +106,6 @@ public class BodyCalculatorActivity extends AppCompatActivity {
                                 startActivity(about);
                                 break;
                         }
-
-
                         return false;
                     }
                 });
@@ -145,10 +151,12 @@ public class BodyCalculatorActivity extends AppCompatActivity {
     public void SetDailyIntake(int spinnerPosition){
         String calories;
         Weight lastWeight = HomeActivity.get_recent_weight();
+
         if (lastWeight == null){
             tvDailyIntake.setText(getText(R.string.stats_error));
             return;
         }
+
         weight = lastWeight.get_weight();
         int height = PreferenceManager.get_height();
         int age = PreferenceManager.get_age();
@@ -162,20 +170,35 @@ public class BodyCalculatorActivity extends AppCompatActivity {
     public void CalculateDays(View v){
         String strGoal = etGoal.getText().toString();
         String strDeficit = etDeficit.getText().toString();
+
         if (strGoal.equals("") || strDeficit.equals("")){
             Toast.makeText(this,R.string.body_calc_null, Toast.LENGTH_LONG).show();
             return;
         }
-        double goal = Double.parseDouble(etGoal.getText().toString());
-        int deficit = Integer.parseInt(etDeficit.getText().toString());
-        int result = Calc.DaysToReachGoalWeight(deficit,weight,goal);
+
+        goal = Double.parseDouble(etGoal.getText().toString());
+        deficit = Integer.parseInt(etDeficit.getText().toString());
+        result = Calc.DaysToReachGoalWeight(deficit,weight,goal);
         tvDays.setText(String.format(Locale.US,getText(R.string.days_result).toString(),result));
+    }
+
+    public void Share(){
+        String strResult = String.format(Locale.US, getText(R.string.share_body).toString(),result,goal,PreferenceManager.get_weightUnit(),deficit);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, strResult);
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_title)));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_bar, menu);
+        if(this instanceof IShareable) {
+            inflater.inflate(R.menu.action_bar, menu);
+        } else {
+            inflater.inflate(R.menu.action_bar_no_share, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -188,8 +211,7 @@ public class BodyCalculatorActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_share:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                Share();
                 return true;
 
             case android.R.id.home:
@@ -197,12 +219,7 @@ public class BodyCalculatorActivity extends AppCompatActivity {
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show();
-
                 return super.onOptionsItemSelected(item);
-
         }
     }
 }

@@ -24,6 +24,16 @@ public class PreferenceManager {
         _editor.apply();
     }
 
+    public static void SampleData(){
+        Wipe();
+        set_name("John");
+        set_age(25);
+        set_height(180);
+        set_gender("Male");
+        set_metric(true);
+        commitChanges();
+    }
+
     public static boolean is_metric(){
         //defaults to metric because imperial is silly
         return _prefs.getBoolean("metric", true);

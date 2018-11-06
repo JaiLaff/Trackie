@@ -21,10 +21,12 @@
     <string name="save">Save</string>
     <string name="wipe">Wipe All Data</string>
     <string name="confirm_title">Wipe All Data</string>
+    <string name="confirm_title_sample_data">Load Sample Data</string>
     <string name="confirm_desc">Are you sure you want to wipe all data? This includes weights and preferences!\n\nTrackie will restart</string>
+    <string name="confirm_desc_sample_data">Are you sure you want to load sample data? This includes weights and preferences!\n\nTrackie will restart</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="stats_error">Statistics will be available to you after 5 entries</string>
+    <string name="stats_error">Stats and calculations will be available to you after 5 entries\n\nYou can load sample data from the settings menu</string>
     <string name="enter_a_weight">Enter a weight first</string>
     <string name="nav_header_error">Have you entered all your personal details?\n\nTo help make our calculations more precise, you can set these in the settings menu.</string>
     <string name="name">Name:</string>
@@ -55,4 +57,12 @@
     <string name="days_result">It will take %s days to reach your goal</string>
     <string name="body_calc_null">Enter user data first!</string>
     <string name="activity_level">Activity Level: </string>
+    <string name="share_title">Share your Trackie Data: </string>
+    <string name="bmi_website">http://healthyweight.health.gov.au/wps/portal/Home/get-started/are-you-a-healthy-weight/bmi/</string>
+    <string name="share_bmi">%s\'s BMI is: %s</string>
+    <string name="share_body">It would take me %d days to reach your goal of %.1f%s given a calorie deficit of %d</string>
+    <string name="github_readme">https://github.com/JaiLaff/Trackie/blob/master/README.md</string>
+    <string name="github">https://github.com/JaiLaff/Trackie/</string>
+    <string name="no_data">Welcome to Trackie, to begin enter data below</string>
+    <string name="load_sample">Load Sample Data</string>
 </resources>

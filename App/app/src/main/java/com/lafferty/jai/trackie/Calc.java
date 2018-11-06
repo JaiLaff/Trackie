@@ -1,7 +1,5 @@
 package com.lafferty.jai.trackie;
 
-import java.lang.reflect.Array;
-
 public class Calc {
 
     private static final double KG_TO_LBS_MULTIPLIER = 2.205;
@@ -32,11 +30,16 @@ public class Calc {
         return weight / (height * height);
     }
 
+    public static double ImperialBMI(double weight, double height){
+        return IMPERIAL_BMI_MULTIPLIER * (weight / (height*height));
+    }
+
     public static int MaintenanceCalories(double weight, int height, int age, String gender, int activityLevel){
         //http://www.checkyourhealth.org/eat-healthy/cal_calculator.php
         int result = 0;
         double activityFactor = ACTIVITY_FACTORS[activityLevel];
         double BMR = 0;
+
         if(PreferenceManager.is_metric()){
             weight = KgToPound(weight);
             height = (int)Math.floor(CMToInch(height));
@@ -46,7 +49,6 @@ public class Calc {
             BMR = 665 + (4.3 * weight) + (4.6 * height) - (4.7 * age);
         } else {
             //Assuming a male body type for "other" and "not selected"
-            //Acts as a worst case scenario
             BMR = 66 + (6.3 * weight) + (12.9 * height) - (6.8 * age);
         }
 
@@ -56,8 +58,10 @@ public class Calc {
 
     public static int DaysToReachGoalWeight(int deficit, double currentWeight, double goalWeight) {
         //Takes current average daily calories, a deficit and a goal
-        //Assumes no change in physical activity level
+        //Assumes no change in physical activity level over the returned period
         //Based on the fact that 3500Cal = ~1lb Fat
+        // CurrentWeeklyIntake - 7(500) -> CurrentWeight -1(Pound)
+        //Hence: DailyIntake - 500 -> CurrentWeight -1/7(Pounds)
         int result = 0;
         double daysForEachPound = 3500/deficit;
         double goalChange = currentWeight - goalWeight;
@@ -66,9 +70,5 @@ public class Calc {
         }
         result = (int)Math.ceil(goalChange * daysForEachPound);
         return result;
-    }
-
-    public static double ImperialBMI(double weight, double height){
-        return IMPERIAL_BMI_MULTIPLIER * (weight / (height*height));
     }
 }

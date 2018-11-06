@@ -26,6 +26,9 @@ public class Stats {
     }
 
     private static int GainStreak(ArrayList<Weight> weights){
+        //Days in a row where weight has been gained
+        //Starting from most recent entry
+        //List is reversed to save reading the entire list for what could be 2 useful iterations
         ArrayList<Weight> _weights = new ArrayList<>(weights);
         Collections.reverse(_weights);
         int days= 0;

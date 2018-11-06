@@ -16,22 +16,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
-public class BMIActivity extends AppCompatActivity {
+public class BMIActivity extends AppCompatActivity implements IShareable{
 
     private DrawerLayout mDrawerLayout;
-    EditText etBmiWeight;
-    EditText etBmiHeight;
+    private EditText etBmiWeight;
+    private EditText etBmiHeight;
+    private double bmi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bmi);
+        bmi = 0;
         InitUI();
     }
 
@@ -54,12 +54,12 @@ public class BMIActivity extends AppCompatActivity {
         //Access the header layout
         View headerView = navigationView.getHeaderView(0);
         TextView headerName = headerView.findViewById(R.id.tvHeaderName);
-        if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
-        else {
+        if (PreferenceManager.get_name() == ""){
+            headerName.setText(R.string.nav_header_error);
+        } else {
             String text = this.getText(R.string.nav_welcome).toString();
             headerName.setText(String.format(Locale.ENGLISH, text, PreferenceManager.get_name()));
         }
-        //TODO: Set some cool text here, stats etc
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -77,6 +77,7 @@ public class BMIActivity extends AppCompatActivity {
                             case R.id.nav_home:
                                 Intent home = new Intent(getBaseContext(),HomeActivity.class);
                                 startActivity(home);
+                                break;
                             case R.id.nav_converter:
                                 Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
                                 startActivity(body);
@@ -113,6 +114,7 @@ public class BMIActivity extends AppCompatActivity {
     public void SetViews(){
         ArrayList<Weight> weights = new ArrayList<>(HomeActivity.get_weights());
         Collections.reverse(weights);
+
         TextView tvBmiWeight = findViewById(R.id.tvBmiWeight);
         TextView tvBmiHeight = findViewById(R.id.tvBmiHeight);
         tvBmiHeight.setText(String.format(Locale.ENGLISH,getText(R.string.height_with_unit).toString(),PreferenceManager.get_heightUnit()));
@@ -132,7 +134,7 @@ public class BMIActivity extends AppCompatActivity {
         tvBmiBody.setText("");
     }
 
-    public double CalculateBMI(){
+    public void CalculateBMI(){
         String strWeight = etBmiWeight.getText().toString();
         String strHeight = etBmiHeight.getText().toString();
         double weight = Double.valueOf(strWeight);
@@ -141,22 +143,22 @@ public class BMIActivity extends AppCompatActivity {
         double result = 0;
         if(!PreferenceManager.is_metric()){result = Calc.ImperialBMI(weight,height);}
         if(PreferenceManager.is_metric()){result = Calc.MetricBMI(weight,height);}
-        return result;
+        bmi = result;
     }
 
-    public void DisplayBmi(double bmi){
+    public void DisplayBmi(){
         TextView tvBmiTitle = findViewById(R.id.tvBmiTitle);
         TextView tvBmiBody = findViewById(R.id.tvBmiBody);
         String name = PreferenceManager.get_name();
         String titleText = String.format(Locale.ENGLISH, getText(R.string.bmi_main).toString(),bmi);
         tvBmiTitle.setText(titleText);
 
-        String range = GenerateBmiRangeText(bmi);
+        String range = GenerateBmiRangeText();
         String bodyText = String.format(Locale.ENGLISH, getText(R.string.bmi_body).toString(),name,range);
         tvBmiBody.setText(bodyText);
     }
 
-    public String GenerateBmiRangeText(double bmi){
+    public String GenerateBmiRangeText(){
 
         if(bmi < 18.5){return getText(R.string.underweight).toString();}
         if(bmi < 24.9){return getText(R.string.normal).toString();}
@@ -167,8 +169,8 @@ public class BMIActivity extends AppCompatActivity {
     }
 
     public void BMI(View v){
-        double bmi = CalculateBMI();
-        DisplayBmi(bmi);
+        CalculateBMI();
+        DisplayBmi();
     }
 
     public void Details(View v){
@@ -176,10 +178,25 @@ public class BMIActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    public void Share(){
+        String name = PreferenceManager.get_name();
+        String strBmi = String.format(Locale.US,"%.2f", bmi);
+        String result = String.format(Locale.US, getText(R.string.share_bmi).toString(), name, strBmi);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, result);
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_title)));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_bar, menu);
+        if(this instanceof IShareable) {
+            inflater.inflate(R.menu.action_bar, menu);
+        } else {
+            inflater.inflate(R.menu.action_bar_no_share, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -192,8 +209,7 @@ public class BMIActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_share:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                Share();
                 return true;
 
             case android.R.id.home:
@@ -201,10 +217,6 @@ public class BMIActivity extends AppCompatActivity {
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show();
-
                 return super.onOptionsItemSelected(item);
 
         }

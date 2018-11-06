@@ -1,6 +1,7 @@
 package com.lafferty.jai.trackie;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -8,12 +9,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.TreeMap;
 
 public class WeightFileHandler {
 
@@ -116,13 +116,12 @@ public class WeightFileHandler {
     }
 
     public static void CheckFileStatus(){
+        //If file does not exist, create it.
         try {
 
             File myFile = new File(_context.getFilesDir(),_filename);
 
-            if (myFile.createNewFile()) {
-                //CRASHES APP
-            }
+            myFile.createNewFile();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -140,6 +139,42 @@ public class WeightFileHandler {
                 outputStreamWriter.close();
             }
         }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void SampleData(Context context){
+        CheckFileStatus();
+        Wipe();
+        ReadFromAssets(context);
+    }
+
+    public static void ReadFromAssets(Context context){
+        try{
+            AssetManager am = context.getAssets();
+            InputStream inputStream = am.open(_filename);
+
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String s = "";
+
+                while ((s = bufferedReader.readLine()) != null){
+                    if(s == ""){continue;}
+                    else {
+                        long date = 0;
+                        double weightVal = 0;
+
+                        String[] splitResult = s.split(",");
+                        date = Long.parseLong(splitResult[0]);
+                        weightVal = Double.parseDouble(splitResult[1]);
+
+                        s = "";
+                        WriteWeight(date,weightVal);
+                    }
+                }
+            }
+        } catch (IOException e){
             e.printStackTrace();
         }
     }

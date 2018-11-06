@@ -1,7 +1,6 @@
 package com.lafferty.jai.trackie;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -27,8 +26,9 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         _dates = new ArrayList<>();
         _weightValues = new ArrayList<>();
         _weightChanges = new ArrayList<>();
-        populateLists();
         _context = context;
+
+        populateLists();
     }
 
     public void populateLists(){
@@ -70,16 +70,16 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
     }
 
 
-    @NonNull
+
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public ViewHolder onCreateViewHolder( ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.history_list_item,viewGroup,false);
         ViewHolder holder = new ViewHolder(v);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+    public void onBindViewHolder( ViewHolder viewHolder, int i) {
         viewHolder.tvWeight.setText(String.format(Locale.ENGLISH, "%s%s",_weightValues.get(i),PreferenceManager.get_weightUnit()));
         viewHolder.tvDate.setText(_dates.get(i));
         formatChange(viewHolder,i);
@@ -95,7 +95,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         TextView tvDate;
         TextView tvChange;
 
-        public ViewHolder(@NonNull View itemView){
+        public ViewHolder( View itemView){
             super(itemView);
 
             tvWeight = itemView.findViewById(R.id.tvListWeight);

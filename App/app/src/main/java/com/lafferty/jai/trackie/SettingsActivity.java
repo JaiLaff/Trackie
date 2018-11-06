@@ -47,7 +47,6 @@ public class SettingsActivity extends AppCompatActivity {
         mDrawerLayout = findViewById(R.id.drawer_layout);
         final NavigationView navigationView = findViewById(R.id.nav_view);
 
-        //Access the header layout
         View headerView = navigationView.getHeaderView(0);
         TextView headerName = headerView.findViewById(R.id.tvHeaderName);
         if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
@@ -55,7 +54,6 @@ public class SettingsActivity extends AppCompatActivity {
             String text = this.getText(R.string.nav_welcome).toString();
             headerName.setText(String.format(Locale.ENGLISH, text, PreferenceManager.get_name()));
         }
-        //TODO: Set some cool text here, stats etc
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -73,6 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
                             case R.id.nav_home:
                                 Intent home = new Intent(getBaseContext(),HomeActivity.class);
                                 startActivity(home);
+                                break;
                             case R.id.nav_converter:
                                 Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
                                 startActivity(body);
@@ -90,8 +89,6 @@ public class SettingsActivity extends AppCompatActivity {
                                 startActivity(about);
                                 break;
                         }
-
-
                         return false;
                     }
                 });
@@ -142,12 +139,7 @@ public class SettingsActivity extends AppCompatActivity {
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show();
-
                 return super.onOptionsItemSelected(item);
-
         }
     }
 

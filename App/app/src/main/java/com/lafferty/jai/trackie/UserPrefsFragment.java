@@ -57,9 +57,6 @@ public class UserPrefsFragment extends Fragment {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),R.array.genders,R.layout.support_simple_spinner_dropdown_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         genderSpinner.setAdapter(adapter);
-        //kgs for is metric, imperial for is NOT metric
-        int selection = PreferenceManager.is_metric() ? 0 : 1;
-        genderSpinner.setSelection(selection);
 
         genderSpinner.setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener() {
@@ -133,7 +130,6 @@ public class UserPrefsFragment extends Fragment {
 
         PreferenceManager.set_name(strName);
         PreferenceManager.set_age(Integer.parseInt(strAge));
-        //TODO: Height Conversion
         PreferenceManager.set_height(height);
         PreferenceManager.set_gender(selectedGender);
         PreferenceManager.commitChanges();

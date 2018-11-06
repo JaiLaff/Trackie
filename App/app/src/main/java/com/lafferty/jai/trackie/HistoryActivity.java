@@ -20,15 +20,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Locale;
 
-public class HistoryActivity extends AppCompatActivity {
+public class HistoryActivity extends AppCompatActivity implements IShareable{
 
     private DrawerLayout mDrawerLayout;
     private ArrayList<Weight> _weights;
-    ArrayList<Weight> _reversed_weights;
+    private ArrayList<Weight> _reversed_weights;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +86,6 @@ public class HistoryActivity extends AppCompatActivity {
         mDrawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
-        //Access the header layout
         View headerView = navigationView.getHeaderView(0);
         TextView headerName = headerView.findViewById(R.id.tvHeaderName);
         if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
@@ -92,7 +93,6 @@ public class HistoryActivity extends AppCompatActivity {
             String text = this.getText(R.string.nav_welcome).toString();
             headerName.setText(String.format(Locale.ENGLISH, text, PreferenceManager.get_name()));
         }
-        //TODO: Set some cool text here, stats etc
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -110,6 +110,7 @@ public class HistoryActivity extends AppCompatActivity {
                             case R.id.nav_home:
                                 Intent home = new Intent(getBaseContext(),HomeActivity.class);
                                 startActivity(home);
+                                break;
                             case R.id.nav_converter:
                                 Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
                                 startActivity(body);
@@ -127,7 +128,6 @@ public class HistoryActivity extends AppCompatActivity {
                                 startActivity(about);
                                 break;
                         }
-
                         return false;
                     }
                 });
@@ -142,10 +142,40 @@ public class HistoryActivity extends AppCompatActivity {
         actionbar.setTitle("Weight History");
     }
 
+    public void Share(){
+        String result = "";
+        String date;
+        double weight;
+        String strWeight;
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy");
+
+        for (Weight w : _weights){
+            date = sdf.format(new Date(w.get_date()));
+            weight = w.get_weight();
+
+            if (!PreferenceManager.is_metric()){
+                weight = Calc.KgToPound(weight);
+            }
+
+            strWeight = String.format(Locale.US, "%.1f", weight);
+            result += String.format(Locale.US, "%s | %s%s\n", date, strWeight,PreferenceManager.get_weightUnit());
+        }
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, result);
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_title)));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_bar, menu);
+        if(this instanceof IShareable) {
+            inflater.inflate(R.menu.action_bar, menu);
+        } else {
+            inflater.inflate(R.menu.action_bar_no_share, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -153,12 +183,12 @@ public class HistoryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
                 return true;
 
             case R.id.action_share:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                Share();
                 return true;
 
             case android.R.id.home:
@@ -166,12 +196,7 @@ public class HistoryActivity extends AppCompatActivity {
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show();
-
                 return super.onOptionsItemSelected(item);
-
         }
     }
 }

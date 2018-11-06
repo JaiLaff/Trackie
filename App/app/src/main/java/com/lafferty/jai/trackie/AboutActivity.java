@@ -1,6 +1,8 @@
 package com.lafferty.jai.trackie;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.NavigationView;
@@ -21,10 +23,11 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-public class AboutActivity extends AppCompatActivity {
+public class AboutActivity extends AppCompatActivity implements IShareable{
 
     private DrawerLayout mDrawerLayout;
     private WebView webview;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +51,15 @@ public class AboutActivity extends AppCompatActivity {
     public void NavigationSetUp(){
         mDrawerLayout = findViewById(R.id.drawer_layout);
         final NavigationView navigationView = findViewById(R.id.nav_view);
-
-        //Access the header layout
         View headerView = navigationView.getHeaderView(0);
         TextView headerName = headerView.findViewById(R.id.tvHeaderName);
-        if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
-        else {
+
+        if (PreferenceManager.get_name() == ""){
+            headerName.setText(R.string.nav_header_error);
+        } else {
             String text = this.getText(R.string.nav_welcome).toString();
             headerName.setText(String.format(Locale.ENGLISH, text, PreferenceManager.get_name()));
         }
-        //TODO: Set some cool text here, stats etc
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -72,7 +74,13 @@ public class AboutActivity extends AppCompatActivity {
                         // For example, swap UI fragments here
 
                         switch (menuItem.getItemId()){
+                            case R.id.nav_home:
+                                Intent home = new Intent(getBaseContext(),HomeActivity.class);
+                                startActivity(home);
+                                break;
                             case R.id.nav_converter:
+                                Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
+                                startActivity(body);
                                 break;
                             case R.id.nav_bmi_calc:
                                 Intent bmi = new Intent(getBaseContext(),BMIActivity.class);
@@ -83,10 +91,10 @@ public class AboutActivity extends AppCompatActivity {
                                 startActivity(history);
                                 break;
                             case R.id.nav_about:
+                                Intent about = new Intent(getBaseContext(),AboutActivity.class);
+                                startActivity(about);
                                 break;
                         }
-
-
                         return false;
                     }
                 });
@@ -104,11 +112,22 @@ public class AboutActivity extends AppCompatActivity {
     public void SetUpPage(){
         webview = findViewById(R.id.wvAbout);
 
+        dialog = new ProgressDialog(AboutActivity.this);
+        dialog.setMessage("Loading..");
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+
         if (isNetworkAvailable()) {
             webview.getSettings().setJavaScriptEnabled(true);
             webview.setWebViewClient(new WebViewClient() {
                 @Override
+                public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    dialog.show();
+                    super.onPageStarted(view, url, favicon);
+                }
+                @Override
                 public void onPageFinished(WebView view, String url) {
+                    //https://stackoverflow.com/questions/3029926/any-way-to-hide-elements-from-webview-android
                     // hide element by class name
                     webview.loadUrl("javascript:(function() { " +
                             "document.getElementsByClassName('Header f4 lh-default clearfix')[0].style.display='none'; })()");
@@ -116,29 +135,45 @@ public class AboutActivity extends AppCompatActivity {
                             "document.getElementsByClassName('reponav-wrapper lh-default')[0].style.display='none'; })()");
                     webview.loadUrl("javascript:(function() { " +
                             "document.getElementsByClassName('footer.clearfix')[0].style.display='none'; })()");
-
+                    dialog.cancel();
+                    dialog.dismiss();
                 }
             });
-            webview.loadUrl("https://github.com/JaiLaff/Trackie/blob/master/README.md");
+
+            webview.loadUrl(getText(R.string.github_readme).toString());
         } else {
             webview.loadUrl("file:///android_asset/about.html");
         }
+
     }
 
     //https://stackoverflow.com/questions/4238921/detect-whether-there-is-an-internet-connection-available-on-android
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    public void Share() {
+        String result = getText(R.string.github).toString();
 
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, result);
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_title)));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_bar, menu);
+
+        if(this instanceof IShareable) {
+            inflater.inflate(R.menu.action_bar, menu);
+        } else {
+            inflater.inflate(R.menu.action_bar_no_share, menu);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -151,8 +186,7 @@ public class AboutActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_share:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                Share();
                 return true;
 
             case android.R.id.home:
@@ -160,10 +194,6 @@ public class AboutActivity extends AppCompatActivity {
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show();
-
                 return super.onOptionsItemSelected(item);
 
         }

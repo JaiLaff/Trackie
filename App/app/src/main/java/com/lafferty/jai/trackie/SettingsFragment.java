@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ public class SettingsFragment extends Fragment {
     private Button btUserDetails;
     private Button btWipe;
     private Button btSave;
+    private Button btLoadData;
     private Spinner spinner;
 
 
@@ -34,6 +36,14 @@ public class SettingsFragment extends Fragment {
         btUserDetails = view.findViewById(R.id.btSetUserPrefs);
         btWipe = view.findViewById(R.id.btWipeData);
         btSave = view.findViewById(R.id.btSaveSettings);
+        btLoadData = view.findViewById(R.id.btLoadSampleData);
+
+        btLoadData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                SampleData();
+            }
+        });
 
         btSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,6 +112,42 @@ public class SettingsFragment extends Fragment {
 
     }
 
+    public void SampleData(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setTitle(this.getText(R.string.confirm_title_sample_data));
+        builder.setMessage(this.getText(R.string.confirm_desc_sample_data));
+
+        //USER CLICK YES
+        builder.setPositiveButton(this.getText(R.string.yes), new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                PreferenceManager.SampleData();
+                WeightFileHandler.SampleData(getContext());
+                dialog.dismiss();
+                //https://stackoverflow.com/questions/15564614/how-to-restart-an-android-application-programmatically
+                Intent i = getContext().getPackageManager().getLaunchIntentForPackage( getContext().getPackageName() );
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                getActivity().finish();
+                startActivity(i);
+            }
+        });
+        //USER CLICK NO
+        builder.setNegativeButton(this.getText(R.string.no), new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Do nothing
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+
     public void wipeAllData(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -114,12 +160,10 @@ public class SettingsFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 Wipe();
                 dialog.dismiss();
-                Intent mStartActivity = new Intent(getActivity(), HomeActivity.class);
-                int mPendingIntentId = 123456;
-                PendingIntent mPendingIntent = PendingIntent.getActivity(getActivity(), mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-                AlarmManager mgr = (AlarmManager)getActivity().getSystemService(getActivity().ALARM_SERVICE);
-                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-                System.exit(0);
+                Intent i = getContext().getPackageManager().getLaunchIntentForPackage( getContext().getPackageName() );
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                getActivity().finish();
+                startActivity(i);
             }
         });
 

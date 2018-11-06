@@ -12,10 +12,10 @@ import java.util.ArrayList;
 
 public class StandardHomeFragment extends Fragment {
 
-    TextView tvStats1;
-    TextView tvStats2;
-    TextView tvMotivate;
-    Button btCheckIn;
+    private TextView tvStats1;
+    private TextView tvStats2;
+    private TextView tvMotivate;
+    private Button btCheckIn;
 
     @Override
     public View onCreateView( LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +41,7 @@ public class StandardHomeFragment extends Fragment {
 
     public void SetStats(){
         ArrayList<Weight> weights = ((HomeActivity)getActivity()).get_weights();
+
         if (weights.size() > 4) {
             String[] weekly = Stats.WeekAverageChange(weights);
             tvStats1.setText(Stats.CurrentStreak(weights));
@@ -48,7 +49,6 @@ public class StandardHomeFragment extends Fragment {
             tvMotivate.setText(weekly[1]);
         } else {
             tvStats1.setText(getText(R.string.stats_error));
-
         }
     }
 }

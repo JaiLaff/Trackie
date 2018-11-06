@@ -9,14 +9,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-
 public class CheckInFragment extends Fragment {
 
-    TextView tvCheckInUnit;
-    EditText etCheckInWeight;
-    Button btAdd;
+    private TextView tvCheckInUnit;
+    private EditText etCheckInWeight;
+    private Button btAdd;
 
     @Override
     public View onCreateView( LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
@@ -42,6 +39,7 @@ public class CheckInFragment extends Fragment {
     public void AddWeight(String text){
         double weightVal;
         long date = Stats.getLongDateWithoutTime();
+
         try{
             weightVal = Double.parseDouble(text);
             if(!PreferenceManager.is_metric()){weightVal = Calc.PoundToKg(weightVal);}

@@ -17,16 +17,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
-//TODO General: Make sure all buttons on all activities/fragments are hooked up
-//TODO General: Make sure metric to lbs conversion and textviews are updated everywhere
-//TODO General: Async task to load the app for the first time
-//TODO 5: Add HomeActivity to side nav menu on all activities
-//TODO 6: Link all pages in side nav menu on all activities
-//TODO 7: Create some form of sharing mechanism (Interface or different action bar)
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements IShareable{
 
     private DrawerLayout mDrawerLayout;
     private static ArrayList<Weight> _weights;
@@ -51,6 +47,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void InitHelpers(){
+        //give all static classes the necessary info
         PreferenceManager.Initialise(this, PREFERENCES_FILENAME);
         WeightFileHandler.Initialise(WEIGHT_DATA_FILENAME, this);
         Stats.Initialise(this);
@@ -67,7 +64,6 @@ public class HomeActivity extends AppCompatActivity {
         mDrawerLayout = findViewById(R.id.drawer_layout);
         final NavigationView navigationView = findViewById(R.id.nav_view);
 
-        //Access the header layout
         View headerView = navigationView.getHeaderView(0);
         TextView headerName = headerView.findViewById(R.id.tvHeaderName);
         if (PreferenceManager.get_name() == ""){headerName.setText(R.string.nav_header_error);}
@@ -75,7 +71,6 @@ public class HomeActivity extends AppCompatActivity {
             String text = this.getText(R.string.nav_welcome).toString();
             headerName.setText(String.format(Locale.ENGLISH, text, PreferenceManager.get_name()));
         }
-        //TODO: Set some cool text here, stats etc
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -93,6 +88,7 @@ public class HomeActivity extends AppCompatActivity {
                             case R.id.nav_home:
                                 Intent home = new Intent(getBaseContext(),HomeActivity.class);
                                 startActivity(home);
+                                break;
                             case R.id.nav_converter:
                                 Intent body = new Intent(getBaseContext(),BodyCalculatorActivity.class);
                                 startActivity(body);
@@ -110,8 +106,6 @@ public class HomeActivity extends AppCompatActivity {
                                 startActivity(about);
                                 break;
                         }
-
-
                         return false;
                     }
                 });
@@ -165,7 +159,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void add_weight(Weight weight){
-        //only if same date
+        //if same date as most recent entry
         if (_weights.size() >0 && weight.get_date() == _weights.get(_weights.size()-1).get_date()){
             _weights.remove(_weights.size()-1);
             _weights.add(weight);
@@ -180,7 +174,13 @@ public class HomeActivity extends AppCompatActivity {
 
     public static void convertWeightsToLbs(){
         //Weird way of getting around null pointer exceptions for a null Boolean
+
+        //Solved an issue where app would begin with the userPref set to imperial yet with metric
+        //data, when converting back to metric to line things up, metric data went under another
+        // "Metric conversion" ruining the integrity of the data
+
         if(Boolean.FALSE.equals(_weightsInMetric)){return;}
+
         for (Weight w : _weights){
             w.convertToLbs();
         }
@@ -189,10 +189,40 @@ public class HomeActivity extends AppCompatActivity {
 
     public static void convertWeightsToKgs(){
         if(Boolean.TRUE.equals(_weightsInMetric)){return;}
+
         for (Weight w : _weights){
             w.convertToKgs();
         }
         _weightsInMetric = true;
+    }
+
+    public void Share(){
+        String result = "My last 14 days:\n";
+        String date;
+        double weight;
+        String strWeight;
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy");
+
+        for (Weight w : _weights){
+            if (w.get_date() > Stats.getLongDateWithoutTime() || w.get_date() < Stats.getLongDateWithoutTime()-1209600000){
+                continue;
+            }
+            date = sdf.format(new Date(w.get_date()));
+            weight = w.get_weight();
+
+            if (!PreferenceManager.is_metric()){
+                weight = Calc.KgToPound(weight);
+            }
+
+            strWeight = String.format(Locale.US, "%.1f", weight);
+            result += String.format(Locale.US, "%s | %s%s\n", date, strWeight,PreferenceManager.get_weightUnit());
+        }
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, result);
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_title)));
     }
 
 
@@ -200,7 +230,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.action_bar, menu);
+        if(this instanceof IShareable) {
+            inflater.inflate(R.menu.action_bar, menu);
+        } else {
+            inflater.inflate(R.menu.action_bar_no_share, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -213,8 +247,7 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_share:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                Share();
                 return true;
 
             case android.R.id.home:
@@ -222,10 +255,6 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show();
-
                 return super.onOptionsItemSelected(item);
 
         }
@@ -236,10 +265,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public static Weight get_recent_weight(){
-        if (_weights.size() > 0){
-            return _weights.get(_weights.size()-1);
-        } else {return null;}
+        if (_weights.size() > 0){ return _weights.get(_weights.size()-1); }
+        else {return null;}
     }
-
-
 }
