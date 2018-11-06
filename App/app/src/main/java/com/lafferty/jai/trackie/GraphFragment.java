@@ -122,7 +122,7 @@ public class GraphFragment extends Fragment {
 
 
         //Functional
-        graph.setTouchEnabled(false);
+        graph.setTouchEnabled(true);
         graph.setScaleEnabled(false);
         graph.setPinchZoom(false);
         graph.setDoubleTapToZoomEnabled(false);
