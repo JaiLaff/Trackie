@@ -130,7 +130,7 @@ public class GraphFragment extends Fragment {
 
     public void RefreshGraph(){
         graph.notifyDataSetChanged();
-        graph.moveViewToX(0);
+        graph.moveViewToX(Stats.getLongDateWithoutTime()-1209600000);
         graph.invalidate();
     }
 
