@@ -29,8 +29,28 @@ The objective of this app is to create a non-trivial app for my Software Develop
 
 In the settings menu you will find a button enabling sample data to be entered into the app. This will allow you to test out the app's functionality without spending multiple weeks inputting data each day.
 
+### Design Diagrams
+
+#### Data Model
+
+Highlights how data is processed from a persistent text file to Trackie
+
+![Trackie Data Model](Design/Diagrams/Trackie-Data-Model.jpeg)
+
+#### Navigation
+
+Navigation map showing how each activity can be accessed anywhere within the app through the side menu
+
+![Trackie Nagivation Model](Design/Diagrams/Trackie-Navigation.jpeg)
+
+#### Class Diagrams
+
+Every class used to create Trackie. Most overridden system methods ignored
+
+![Trackie Class Diagrams](Design/Diagrams/Trackie-Classes.jpeg)
+
 ### Sources
 
-- [checkyourhealth.org](http://www.checkyourhealth.org/eat-healthy/cal_calculator.php)
-- [healthyweight.health.gov.au](http://healthyweight.health.gov.au/wps/portal/Home/get-started/are-you-a-healthy-weight/bmi/)
-- [PhilJay's MPAndroidChart Library](https://github.com/PhilJay/MPAndroidChart)
+- [checkyourhealth.org](http://www.checkyourhealth.org/eat-healthy/cal_calculator.php): Used to calculate calorie deficits in order to gain weight
+- [healthyweight.health.gov.au](http://healthyweight.health.gov.au/wps/portal/Home/get-started/are-you-a-healthy-weight/bmi/): Data stripped into BMIDetailsActivity, equation used in BMIActivity
+- [PhilJay's MPAndroidChart Library](https://github.com/PhilJay/MPAndroidChart): The graphing library used in GraphFragment
