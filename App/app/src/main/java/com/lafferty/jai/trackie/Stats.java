@@ -63,23 +63,21 @@ public class Stats {
         Collections.reverse(_weights);
         Collections.reverse(weights);
 
-        try{
+
             long testDate = _weights.get(0).get_date() - (7 * 86400000);
             //If the second to most recent date is out of the range
             //Then there is no change as only 1 date is within range
-            if(_weights.get(1).get_date() < testDate) {
+            if(_weights.get(1).get_date() < testDate || _weights.size() < 4) {
                 return 0;
             }
             for (i = 1; _weights.get(i).get_date() >= testDate;i++){
-                if((i == _weights.size()-1) || (_weights.get(i).get_date() <= testDate)){
+                if((i == _weights.size()-1) || (_weights.get(i+1).get_date() <= testDate)){
                     change = _weights.get(0).get_weight() - _weights.get(i).get_weight();
                     return change;
                 }
             }
 
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+
 
         return change;
     }

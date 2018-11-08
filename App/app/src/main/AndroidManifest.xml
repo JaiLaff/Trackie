@@ -33,8 +33,12 @@
         <activity
             android:name=".BmiDetailsActivity"
             android:launchMode="singleInstance" />
-        <activity android:name=".AboutActivity" />
-        <activity android:name=".BodyCalculatorActivity"></activity>
+        <activity
+            android:name=".AboutActivity"
+            android:launchMode="singleInstance"/>
+        <activity
+            android:name=".BodyCalculatorActivity"
+            android:launchMode="singleInstance"/>
     </application>
 
 </manifest>
