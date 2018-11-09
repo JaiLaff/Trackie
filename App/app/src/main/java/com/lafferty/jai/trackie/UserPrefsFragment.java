@@ -33,7 +33,7 @@ public class UserPrefsFragment extends Fragment {
     @Override
     public void onViewCreated( View view,  Bundle savedInstanceState) {
         tvUPHeight = view.findViewById(R.id.tvUPHeight);
-        tvUPHeight.setText(String.format(Locale.ENGLISH,getActivity().getText(R.string.height).toString(), PreferenceManager.get_heightUnit()));
+        tvUPHeight.setText(String.format(Locale.ENGLISH,getActivity().getText(R.string.height_with_unit).toString(), PreferenceManager.get_heightUnit()));
         genderSpinner = view.findViewById(R.id.GenderSpinner);
         etUPName = view.findViewById(R.id.etUPName);
         etUPAge = view.findViewById(R.id.etUPAge);
