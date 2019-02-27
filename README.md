@@ -4,7 +4,7 @@
 
 Trackie is a weight tracking progress app designed to visually represent the weight of the user in their weight gain/loss journey.
 
-![Trackie Screens](Design/TrackieScreenshots.jpg)
+![Trackie Screens](Design/Screenshots/TrackieScreenshots.jpg)
 
 ### Objective
 
@@ -28,6 +28,8 @@ The objective of this app is to create a non-trivial app for my Software Develop
 ### How to Demo
 
 In the settings menu you will find a button enabling sample data to be entered into the app. This will allow you to test out the app's functionality without spending multiple weeks inputting data each day.
+
+![Loading Sample Data](Design/Screenshots/LoadData.jpg)
 
 ### Design Diagrams
 
